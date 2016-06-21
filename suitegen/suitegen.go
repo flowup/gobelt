@@ -1,11 +1,11 @@
 package suitegen
 
 import (
-	"github.com/alecthomas/template"
 	"github.com/flowup/gogen"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 var (
@@ -41,6 +41,7 @@ func Test{{.SuiteName}}Suite(t *testing.T) {
 `))
 )
 
+//
 type TemplateData struct {
 	Package string // name of the package
 	SuiteName string // suite name (without Suite)
@@ -70,7 +71,7 @@ func Generate(args []string) error {
 		// retrieve the file from the build
 		file := build.Files[arg]
 
-		// initialize the data stucture
+		// initialize the data structure
 		data := TemplateData{
 			Package: file.Package(),
 			SuiteName: "",
