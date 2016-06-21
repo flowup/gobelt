@@ -62,7 +62,7 @@ func GenerateGorm(args []string) error {
 			// update suite name
 			data.ServiceName = stName
 			// add the suite
-			serviceTemplate.Execute()
+			serviceTemplate.Execute(out, data)
 
 			// add suite test execution
 			footerTemplate.Execute(out, data)
