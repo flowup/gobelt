@@ -10,11 +10,47 @@ import (
 
 var (
 	headerTemplate = template.Must(template.New("header").Parse(`
+package {{.Package}}
 
+import (
+	"github.com/jinzhu/gorm"
+	"errors"
+	"{{.ModelImport}}"
+)
+
+/*
+@Init
+*/
+
+type {{.ModelName}}DAO struct {
+	db *gorm.DB
+}
+
+// New{{.Model}}DAO creates a new Data Access Object for the
+// {{.ModelName}} model.
+func New{{.ModelName}}DAO (db *gorm.DB) *{{.ModelName}}Service {
+	return &{{.ModelName}}DAO{
+		db: db,
+	}
+}
 `))
 
 	serviceTemplate = template.Must(template.New("service").Parse(`
+/*
+@CRUD
+*/
 
+func (dao *{{.ModelName}}DAO) Create(m *{{.ModelImport}}) ({
+}
+
+func (dao *{{.ModelName}}DAO) Read(m *{{.ModelImport}}) ({
+}
+
+func (dao *{{.ModelName}}DAO) Update(m *{{.ModelImport}}) ({
+}
+
+func (dao *{{.ModelName}}DAO) Delete(m *{{.ModelImport}}) ({
+}
 `))
 
 	footerTemplate = template.Must(template.New("footer").Parse(`
