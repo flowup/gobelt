@@ -24,7 +24,24 @@ import (
 	suiteTemplate = template.Must(template.New("suite").Parse(`
 type {{.SuiteName}}Suite struct {
 	suite.Suite
-}`))
+}
+
+func (s *{{.SuiteName}}Suite) SetupSuite() {
+
+}
+
+func (s *{{.SuiteName}}Suite) TearDownSuite() {
+
+}
+
+func (s *{{.SuiteName}}Suite) SetupTest() {
+
+}
+
+func (s *{{.SuiteName}}Suite) TearDownTest() {
+
+}
+`))
 
 	// Template of each function
 	functionTemplate = template.Must(template.New("function").Parse(`
