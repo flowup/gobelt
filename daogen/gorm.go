@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"os"
 	"github.com/flowup/gogen"
+  "runtime"
 )
 
 var (
@@ -26,14 +27,14 @@ import (
 @Init
 */
 
-type {{.ModelName}}DAO struct {
+type {{.DAOName}} struct {
 	db *gorm.DB
 }
 
-// New{{.ModelName}}DAO creates a new Data Access Object for the
+// New{{.DAOName}} creates a new Data Access Object for the
 // {{.ModelName}} model.
-func New{{.ModelName}}DAO (db *gorm.DB) *{{.ModelName}}DAO {
-	return &{{.ModelName}}DAO{
+func New{{.DAOName}} (db *gorm.DB) *{{.DAOName}} {
+	return &{{.DAOName}}{
 		db: db,
 	}
 }
@@ -42,17 +43,20 @@ func New{{.ModelName}}DAO (db *gorm.DB) *{{.ModelName}}DAO {
 @CRUD
 */
 
-func (dao *{{.ModelName}}DAO) Create(m *{{.Package}}.{{.ModelName}}) {
+func (dao *{{.DAOName}}) Create(m *{{.Package}}.{{.ModelName}}) {
   dao.db.Create(m)
 }
 
-func (dao *{{.ModelName}}DAO) Read(m *{{.Package}}.{{.ModelName}}) {
+func (dao *{{.DAOName}}) Read(m *{{.Package}}.{{.ModelName}}) {
 }
 
-func (dao *{{.ModelName}}DAO) Update(m *{{.Package}}.{{.ModelName}}) {
+func (dao *{{.DAOName}}) FindByID(id uint64) {
 }
 
-func (dao *{{.ModelName}}DAO) Delete(m *{{.Package}}.{{.ModelName}}) {
+func (dao *{{.DAOName}}) Update(m *{{.Package}}.{{.ModelName}}) {
+}
+
+func (dao *{{.DAOName}}) Delete(m *{{.Package}}.{{.ModelName}}) {
   dao.db.Delete(m)
 }
 `))
@@ -67,6 +71,7 @@ type TemplateData struct {
 	ServiceName string
 	ModelName string
   ProjectImport string
+  DAOName string
 }
 
 func GenerateGorm(args []string) error {
@@ -76,6 +81,7 @@ func GenerateGorm(args []string) error {
 		name := strings.Split(filepath.Base(arg), ".")[0]
 		// get the dir
 		path := filepath.Dir(arg)
+    absolutePath, _ := filepath.Abs(arg)
 		out, err := os.Create(filepath.Join(path, name + ".service.go"))
 		if err != nil {
 			return err
@@ -87,6 +93,19 @@ func GenerateGorm(args []string) error {
 			return err
 		}
 
+    var splitPaths []string
+    var importString string
+    if runtime.GOOS == "windows" {
+      splitPaths = strings.SplitAfter(absolutePath, "src\\")
+      importString = splitPaths[len(splitPaths) - 1]
+      importString = strings.Replace(importString, "\\", "/", -1)
+    } else {
+      splitPaths = strings.SplitAfter(absolutePath, "src/")
+      importString = splitPaths[len(splitPaths) - 1]
+    }
+
+    importString = strings.TrimRight(importString, "/"+name+".go")
+
 		// retrieve the file from the build
 		file := build.Files[arg]
 
@@ -94,7 +113,10 @@ func GenerateGorm(args []string) error {
 		data := TemplateData{
 			Package: file.Package(),
 			ServiceName: "",
-      ProjectImport: "flowdock.eu/pillmo/server/model", //this should be automated, using gogen
+      ProjectImport: importString,
+      // currently ProjectImport is parsed from path,
+      // should be parsed using gogen
+      // (could not work if a project has src/ directory in it)
 		}
 
 		// add header to the test file
@@ -105,6 +127,7 @@ func GenerateGorm(args []string) error {
 			// update suite name
 			data.ServiceName = stName
       data.ModelName = stName
+      data.DAOName = data.ModelName + "DAO"
 			// add the suite
 			serviceTemplate.Execute(out, data)
 
