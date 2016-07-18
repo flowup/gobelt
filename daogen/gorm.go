@@ -15,7 +15,6 @@ package dao
 
 import (
 	"github.com/jinzhu/gorm"
-	"errors"
 	"{{.ProjectImport}}/{{.Package}}"
 )
 
@@ -27,6 +26,7 @@ import (
 @Init
 */
 
+// {{.DAOName}} is a data access object to a database containing {{.ModelName}}s
 type {{.DAOName}} struct {
 	db *gorm.DB
 }
@@ -43,6 +43,8 @@ func New{{.DAOName}} (db *gorm.DB) *{{.DAOName}} {
 @CRUD
 */
 
+
+// Create will create single {{.ModelName}} in database.
 func (dao *{{.DAOName}}) Create(m *{{.Package}}.{{.ModelName}}) {
   dao.db.Create(m)
 }
@@ -50,12 +52,22 @@ func (dao *{{.DAOName}}) Create(m *{{.Package}}.{{.ModelName}}) {
 func (dao *{{.DAOName}}) Read(m *{{.Package}}.{{.ModelName}}) {
 }
 
-func (dao *{{.DAOName}}) FindByID(id uint64) {
+// FindByID will find {{.ModelName}} by ID given by parameter
+func (dao *{{.DAOName}}) FindByID(id uint64) *{{.Package}}.{{.ModelName}}{
+  var m *{{.Package}}.{{.ModelName}}
+  if dao.db.First(&m, id).RecordNotFound() {
+    return nil
+  }
+
+  return m
 }
 
+
+// Update will update a record of {{.ModelName}} in DB
 func (dao *{{.DAOName}}) Update(m *{{.Package}}.{{.ModelName}}) {
 }
 
+// Delete will soft-delete a single {{.ModelName}}
 func (dao *{{.DAOName}}) Delete(m *{{.Package}}.{{.ModelName}}) {
   dao.db.Delete(m)
 }
