@@ -10,13 +10,17 @@ import (
 
 var (
 	headerTemplate = template.Must(template.New("header").Parse(`
-package {{.Package}}
+package dao
 
 import (
 	"github.com/jinzhu/gorm"
 	"errors"
-	"{{.ModelImport}}"
+	"{{.ProjectImport}}/{{.Package}}"
 )
+
+`))
+
+	serviceTemplate = template.Must(template.New("service").Parse(`
 
 /*
 @Init
@@ -26,30 +30,30 @@ type {{.ModelName}}DAO struct {
 	db *gorm.DB
 }
 
-// New{{.Model}}DAO creates a new Data Access Object for the
+// New{{.ModelName}}DAO creates a new Data Access Object for the
 // {{.ModelName}} model.
-func New{{.ModelName}}DAO (db *gorm.DB) *{{.ModelName}}Service {
+func New{{.ModelName}}DAO (db *gorm.DB) *{{.ModelName}}DAO {
 	return &{{.ModelName}}DAO{
 		db: db,
 	}
 }
-`))
 
-	serviceTemplate = template.Must(template.New("service").Parse(`
 /*
 @CRUD
 */
 
-func (dao *{{.ModelName}}DAO) Create(m *{{.ModelImport}}) ({
+func (dao *{{.ModelName}}DAO) Create(m *{{.Package}}.{{.ModelName}}) {
+  dao.db.Create(m)
 }
 
-func (dao *{{.ModelName}}DAO) Read(m *{{.ModelImport}}) ({
+func (dao *{{.ModelName}}DAO) Read(m *{{.Package}}.{{.ModelName}}) {
 }
 
-func (dao *{{.ModelName}}DAO) Update(m *{{.ModelImport}}) ({
+func (dao *{{.ModelName}}DAO) Update(m *{{.Package}}.{{.ModelName}}) {
 }
 
-func (dao *{{.ModelName}}DAO) Delete(m *{{.ModelImport}}) ({
+func (dao *{{.ModelName}}DAO) Delete(m *{{.Package}}.{{.ModelName}}) {
+  dao.db.Delete(m)
 }
 `))
 
@@ -61,6 +65,8 @@ func (dao *{{.ModelName}}DAO) Delete(m *{{.ModelImport}}) ({
 type TemplateData struct {
 	Package string
 	ServiceName string
+	ModelName string
+  ProjectImport string
 }
 
 func GenerateGorm(args []string) error {
@@ -88,6 +94,7 @@ func GenerateGorm(args []string) error {
 		data := TemplateData{
 			Package: file.Package(),
 			ServiceName: "",
+      ProjectImport: "flowdock.eu/pillmo/server/model", //this should be automated, using gogen
 		}
 
 		// add header to the test file
@@ -97,6 +104,7 @@ func GenerateGorm(args []string) error {
 		for stName, _ := range file.Structs() {
 			// update suite name
 			data.ServiceName = stName
+      data.ModelName = stName
 			// add the suite
 			serviceTemplate.Execute(out, data)
 
