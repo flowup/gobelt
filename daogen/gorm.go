@@ -64,7 +64,14 @@ func (dao *{{.DAOName}}) FindByID(id uint64) *{{.Package}}.{{.ModelName}}{
 
 
 // Update will update a record of {{.ModelName}} in DB
-func (dao *{{.DAOName}}) Update(m *{{.Package}}.{{.ModelName}}) {
+func (dao *{{.DAOName}}) Update(m *{{.Package}}.{{.ModelName}}, id uint64) *{{.Package}}.{{.ModelName}}{
+	oldVal := dao.FindByID(id)
+	if oldVal == nil {
+		return nil
+	}
+
+	dao.db.Model(&oldVal).Updates(m)
+	return oldVal
 }
 
 // Delete will soft-delete a single {{.ModelName}}
