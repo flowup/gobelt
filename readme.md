@@ -16,7 +16,7 @@ This library is used by installing it from source, running it with gobelt comman
 ```cmd
 
 $go get github.com/flowup/gobelt
-$go build
+$go install ./cmd/gobelt/
 
 $gobelt dao $HOME/model.go
 
