@@ -15,39 +15,39 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/flowup/gobelt/suitegen"
+  "github.com/spf13/cobra"
+  "github.com/flowup/gobelt/suitegen"
 )
 
 // suiteCmd represents the suite command
 var suiteCmd = &cobra.Command{
-	Use:   "suite",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
+  Use:   "suite",
+  Short: "A brief description of your command",
+  Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		err := suitegen.Generate(args)
-		if err != nil {
-			panic(err)
-		}
-	},
+  Run: func(cmd *cobra.Command, args []string) {
+    err := suitegen.Generate(args)
+    if err != nil {
+      panic(err)
+    }
+  },
 }
 
 func init() {
-	RootCmd.AddCommand(suiteCmd)
+  RootCmd.AddCommand(suiteCmd)
 
-	// Here you will define your flags and configuration settings.
+  // Here you will define your flags and configuration settings.
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// suiteCmd.PersistentFlags().String("foo", "", "A help for foo")
+  // Cobra supports Persistent Flags which will work for this command
+  // and all subcommands, e.g.:
+  // suiteCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// suiteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+  // Cobra supports local flags which will only run when this command
+  // is called directly, e.g.:
+  // suiteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 }

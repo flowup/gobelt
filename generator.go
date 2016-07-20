@@ -1,5 +1,5 @@
 package gobelt
 
 type Generator interface {
-	Generate(args []string) error
+  Generate(args []string) error
 }

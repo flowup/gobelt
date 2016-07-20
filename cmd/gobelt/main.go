@@ -17,5 +17,5 @@ package main
 import "github.com/flowup/gobelt/cmd/gobelt/cmd"
 
 func main() {
-	cmd.Execute()
+  cmd.Execute()
 }
