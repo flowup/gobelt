@@ -1,18 +1,17 @@
 package daogen
 
 import (
-	"text/template"
-	"strings"
-	"path/filepath"
-	"os"
-	"github.com/flowup/gogen"
+  "text/template"
+  "strings"
+  "path/filepath"
+  "os"
+  "github.com/flowup/gogen"
+  "github.com/azer/snakecase"
   "runtime"
 )
 
-
-
 var (
-	headerTemplate = template.Must(template.New("header").Parse(`
+  headerTemplate = template.Must(template.New("header").Parse(`
 package {{.Package}}
 
 import (
@@ -21,7 +20,7 @@ import (
 
 `))
 
-	serviceTemplate = template.Must(template.New("service").Parse(`
+  serviceTemplate = template.Must(template.New("service").Parse(`
 
 /*
 @Init
@@ -61,7 +60,7 @@ func (dao *{{.DAOName}}) Read(m *{{.ModelPackage}}{{.ModelName}}) []{{.ModelPack
 
 // ReadByID will find {{.ModelName}} by ID given by parameter
 func (dao *{{.DAOName}}) ReadByID(id uint64) *{{.ModelPackage}}{{.ModelName}}{
-  var m *{{.ModelPackage}}{{.ModelName}}
+  m := &{{.ModelPackage}}{{.ModelName}}{}
   if dao.db.First(&m, id).RecordNotFound() {
     return nil
   }
@@ -94,14 +93,14 @@ func (dao *{{.DAOName}}) Delete(m *{{.ModelPackage}}{{.ModelName}}) {
 
 // ReadBy{{.FieldName}} will find all records
 // matching the value given by parameter
-func (dao *{{.DAOName}}) ReadBy{{.FieldName}} (m {{.FieldType}}) []{{.ModelPackage}}{{.ModelName}}{
+func (dao *{{.DAOName}}) ReadBy{{.FieldName}} (m {{.FieldType}}) []{{.ModelPackage}}{{.ModelName}} {
   retVal := []{{.ModelPackage}}{{.ModelName}}{}
   dao.db.Where(&{{.ModelPackage}}{{.ModelName}}{ {{.FieldName}} : m }).Find(&retVal)
 
   return retVal
 }
 
-// DeleteBy{{.FieldName}} deletes all recoords in database with
+// DeleteBy{{.FieldName}} deletes all records in database with
 // {{.FieldName}} the same as parameter given
 func (dao *{{.DAOName}}) DeleteBy{{.FieldName}} (m {{.FieldType}}) {
   dao.db.Where(&{{.ModelPackage}}{{.ModelName}}{ {{.FieldName}} : m }).Delete(&{{.ModelPackage}}{{.ModelName}}{})
@@ -110,13 +109,13 @@ func (dao *{{.DAOName}}) DeleteBy{{.FieldName}} (m {{.FieldType}}) {
 // EditBy{{.FieldName}} will edit all records in database
 // with the same {{.FieldName}} as parameter given
 // using model given by parameter
-func (dao *{{.DAOName}}) EditBy{{.FieldName}} (m {{.FieldType}}, newVals {{.ModelPackage}}{{.ModelName}}) {
-  dao.db.Where(&{{.ModelPackage}}{{.ModelName}}{ {{.FieldName}} : m }).Updates(newVals)
+func (dao *{{.DAOName}}) EditBy{{.FieldName}} (m {{.FieldType}}, newVals *{{.ModelPackage}}{{.ModelName}}) {
+  dao.db.Table("{{.TableName}}").Where(&{{.ModelPackage}}{{.ModelName}}{ {{.FieldName}} : m }).Updates(newVals)
 }
 
 // Set{{.FieldName}} will set {{.FieldName}}
 // to a value given by parameter
-func (dao *{{.DAOName}}) Set{{.FieldName}} (m *{{.ModelPackage}}{{.ModelName}}, newVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}}{
+func (dao *{{.DAOName}}) Set{{.FieldName}} (m *{{.ModelPackage}}{{.ModelName}}, newVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}} {
   m.{{.FieldName}} = newVal
   record := dao.ReadByID(uint64(m.ID))
 
@@ -128,55 +127,56 @@ func (dao *{{.DAOName}}) Set{{.FieldName}} (m *{{.ModelPackage}}{{.ModelName}}, 
 
   sliceFieldTemplate = template.Must(template.New("sliceField").Parse(`
 
-func (dao *{{.DAOName}}) Add{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}}{
+func (dao *{{.DAOName}}) Add{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}} {
   dao.db.Model(&m).Association("{{.FieldName}}").Append(asocVal)
 
   return m
 }
 
-func (dao *{{.DAOName}}) Remove{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}}{
+func (dao *{{.DAOName}}) Remove{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}} {
   dao.db.Model(&m).Association("{{.FieldName}}").Delete(asocVal)
 
   return m
 }
 `))
 
-	footerTemplate = template.Must(template.New("footer").Parse(`
+  footerTemplate = template.Must(template.New("footer").Parse(`
 
 `))
 )
 
 type TemplateData struct {
-	Package string
-  ModelPackage string
-	ServiceName string
-	ModelName string
+  Package       string
+  ModelPackage  string
+  ServiceName   string
+  ModelName     string
   ProjectImport string
-  DAOName string
-  FieldName string
-  FieldType string
+  DAOName       string
+  TableName     string
+  FieldName     string
+  FieldType     string
 }
 
 func GenerateGorm(args []string) error {
-	// for each passed file
-	for _, arg := range args {
-		// get only the file name
-		name := strings.Split(filepath.Base(arg), ".")[0]
-		// get the dir
-		path := filepath.Dir(arg)
+  // for each passed file
+  for _, arg := range args {
+    // get only the file name
+    name := strings.Split(filepath.Base(arg), ".")[0]
+    // get the dir
+    path := filepath.Dir(arg)
     absolutePath, _ := filepath.Abs(arg)
     pwd, err := os.Getwd()
     pwd = filepath.Base(pwd)
-		out, err := os.Create(filepath.Join(path, name + ".service.go"))
-		if err != nil {
-			return err
-		}
+    out, err := os.Create(filepath.Join(path, name + ".dao.gen.go"))
+    if err != nil {
+      return err
+    }
 
-		// get the build
-		build, err := gogen.ParseFile(arg)
-		if err != nil {
-			return err
-		}
+    // get the build
+    build, err := gogen.ParseFile(arg)
+    if err != nil {
+      return err
+    }
 
     var splitPaths []string
     var importString string
@@ -189,10 +189,10 @@ func GenerateGorm(args []string) error {
       importString = splitPaths[len(splitPaths) - 1]
     }
 
-    importString = strings.TrimRight(importString, "/"+name+".go")
+    importString = strings.TrimRight(importString, "/" + name + ".go")
 
-		// retrieve the file from the build
-		file := build.Files[arg]
+    // retrieve the file from the build
+    file := build.Files[arg]
 
     var modelPackage string
     if pwd == file.Package() {
@@ -200,31 +200,32 @@ func GenerateGorm(args []string) error {
       importString = ""
     } else {
       modelPackage = file.Package() + "."
-      importString = "\n  \""+importString+"\""
+      importString = "\n  \"" + importString + "\""
     }
 
-		// initialize the data structure
-		data := TemplateData{
-			Package: pwd,
+    // initialize the data structure
+    data := TemplateData{
+      Package: pwd,
       ModelPackage: modelPackage,
-			ServiceName: "",
+      ServiceName: "",
       ProjectImport: importString,
       // currently ProjectImport is parsed from path,
       // should be parsed using gogen
       // (could not work if a project has src/ directory in it)
-		}
+    }
 
-		// add header to the test file
-		headerTemplate.Execute(out, data)
+    // add header to the test file
+    headerTemplate.Execute(out, data)
 
-		// iterate over structures
-		for stName, stVal := range file.Structs() {
-			// update suite name
-			data.ServiceName = stName
+    // iterate over structures
+    for stName, stVal := range file.Structs() {
+      // update suite name
+      data.ServiceName = stName
       data.ModelName = stName
       data.DAOName = data.ModelName + "DAO"
-			// add the suite
-			serviceTemplate.Execute(out, data)
+      data.TableName = snakecase.SnakeCase(stName) + "s"
+      // add the suite
+      serviceTemplate.Execute(out, data)
 
       for _, fieldVal := range stVal.Fields() {
 
@@ -233,23 +234,23 @@ func GenerateGorm(args []string) error {
         data.FieldType, typeType = fieldVal.Type()
         //if it is not a gorm ID or one of
         // the time parameters execute field template
-        if  data.FieldName != "ID"&&
-            data.FieldName != "CreatedAt" &&
-            data.FieldName != "UpdatedAt" &&
-            data.FieldName != "DeletedAt" {
+        if data.FieldName != "ID"&&
+          data.FieldName != "CreatedAt" &&
+          data.FieldName != "UpdatedAt" &&
+          data.FieldName != "DeletedAt" {
           switch typeType {
           case gogen.PrimitiveType:
             simpleFieldTemplate.Execute(out, data)
           case gogen.SliceType:
-            //sliceFieldTemplate.Execute(out, data) // support for slices is not yet finished
+          //sliceFieldTemplate.Execute(out, data) // support for slices is not yet finished
           }
         }
       }
 
-			// add suite test execution
-			footerTemplate.Execute(out, data)
-		}
-	}
+      // add suite test execution
+      footerTemplate.Execute(out, data)
+    }
+  }
 
-	return nil
+  return nil
 }
