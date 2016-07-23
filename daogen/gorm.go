@@ -1,18 +1,18 @@
 package daogen
 
 import (
-	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
-	"text/template"
+  "os"
+  "path/filepath"
+  "runtime"
+  "strings"
+  "text/template"
 
-	"github.com/azer/snakecase"
-	"github.com/flowup/gogen"
+  "github.com/azer/snakecase"
+  "github.com/flowup/gogen"
 )
 
 var (
-	headerTemplate = template.Must(template.New("header").Parse(`
+  headerTemplate = template.Must(template.New("header").Parse(`
 package {{.Package}}
 
 import (
@@ -21,7 +21,7 @@ import (
 
 `))
 
-	serviceTemplate = template.Must(template.New("service").Parse(`
+  serviceTemplate = template.Must(template.New("service").Parse(`
 
 /*
 @Init
@@ -87,7 +87,7 @@ func (dao *{{.DAOName}}) Delete(m *{{.ModelPackage}}{{.ModelName}}) {
 }
 `))
 
-	simpleFieldTemplate = template.Must(template.New("simpleField").Parse(`
+  simpleFieldTemplate = template.Must(template.New("simpleField").Parse(`
 /*
 @{{.FieldName}}
 */
@@ -126,7 +126,7 @@ func (dao *{{.DAOName}}) Set{{.FieldName}} (m *{{.ModelPackage}}{{.ModelName}}, 
 }
 `))
 
-	sliceFieldTemplate = template.Must(template.New("sliceField").Parse(`
+  sliceFieldTemplate = template.Must(template.New("sliceField").Parse(`
 
 func (dao *{{.DAOName}}) Add{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}} {
   dao.db.Model(&m).Association("{{.FieldName}}").Append(asocVal)
@@ -141,117 +141,117 @@ func (dao *{{.DAOName}}) Remove{{.FieldName}}Association (m *{{.ModelPackage}}{{
 }
 `))
 
-	footerTemplate = template.Must(template.New("footer").Parse(`
+  footerTemplate = template.Must(template.New("footer").Parse(`
 
 `))
 )
 
 type TemplateData struct {
-	Package       string
-	ModelPackage  string
-	ServiceName   string
-	ModelName     string
-	ProjectImport string
-	DAOName       string
-	TableName     string
-	FieldName     string
-	FieldType     string
+  Package       string
+  ModelPackage  string
+  ServiceName   string
+  ModelName     string
+  ProjectImport string
+  DAOName       string
+  TableName     string
+  FieldName     string
+  FieldType     string
 }
 
 func GenerateGorm(args []string) error {
-	// for each passed file
-	for _, arg := range args {
-		// get only the file name
-		name := strings.Split(filepath.Base(arg), ".")[0]
-		// get the dir
-		path := filepath.Dir(arg)
-		absolutePath, _ := filepath.Abs(arg)
-		pwd, err := os.Getwd()
-		pwd = filepath.Base(pwd)
-		out, err := os.Create(filepath.Join(path, name+".dao.gen.go"))
-		if err != nil {
-			return err
-		}
+  // for each passed file
+  for _, arg := range args {
+    // get only the file name
+    name := strings.Split(filepath.Base(arg), ".")[0]
+    // get the dir
+    path := filepath.Dir(arg)
+    absolutePath, _ := filepath.Abs(arg)
+    pwd, err := os.Getwd()
+    pwd = filepath.Base(pwd)
+    out, err := os.Create(filepath.Join(path, name + ".dao.gen.go"))
+    if err != nil {
+      return err
+    }
 
-		// get the build
-		build, err := gogen.ParseFile(arg)
-		if err != nil {
-			return err
-		}
+    // get the build
+    build, err := gogen.ParseFile(arg)
+    if err != nil {
+      return err
+    }
 
-		var splitPaths []string
-		var importString string
-		if runtime.GOOS == "windows" {
-			splitPaths = strings.SplitAfter(absolutePath, "src\\")
-			importString = splitPaths[len(splitPaths)-1]
-			importString = strings.Replace(importString, "\\", "/", -1)
-		} else {
-			splitPaths = strings.SplitAfter(absolutePath, "src/")
-			importString = splitPaths[len(splitPaths)-1]
-		}
+    var splitPaths []string
+    var importString string
+    if runtime.GOOS == "windows" {
+      splitPaths = strings.SplitAfter(absolutePath, "src\\")
+      importString = splitPaths[len(splitPaths) - 1]
+      importString = strings.Replace(importString, "\\", "/", -1)
+    } else {
+      splitPaths = strings.SplitAfter(absolutePath, "src/")
+      importString = splitPaths[len(splitPaths) - 1]
+    }
 
-		importString = strings.TrimRight(importString, "/"+name+".go")
+    importString = strings.TrimRight(importString, "/" + name + ".go")
 
-		// retrieve the file from the build
-		file := build.Files[arg]
+    // retrieve the file from the build
+    file := build.Files[arg]
 
-		var modelPackage string
-		if pwd == file.Package() {
-			modelPackage = ""
-			importString = ""
-		} else {
-			modelPackage = file.Package() + "."
-			importString = "\n  \"" + importString + "\""
-		}
+    var modelPackage string
+    if pwd == file.Package() {
+      modelPackage = ""
+      importString = ""
+    } else {
+      modelPackage = file.Package() + "."
+      importString = "\n  \"" + importString + "\""
+    }
 
-		// initialize the data structure
-		data := TemplateData{
-			Package:       pwd,
-			ModelPackage:  modelPackage,
-			ServiceName:   "",
-			ProjectImport: importString,
-			// currently ProjectImport is parsed from path,
-			// should be parsed using gogen
-			// (could not work if a project has src/ directory in it)
-		}
+    // initialize the data structure
+    data := TemplateData{
+      Package:       pwd,
+      ModelPackage:  modelPackage,
+      ServiceName:   "",
+      ProjectImport: importString,
+      // currently ProjectImport is parsed from path,
+      // should be parsed using gogen
+      // (could not work if a project has src/ directory in it)
+    }
 
-		// add header to the test file
-		headerTemplate.Execute(out, data)
+    // add header to the test file
+    headerTemplate.Execute(out, data)
 
-		// iterate over structures
-		for stName, stVal := range file.Structs() {
-			// update suite name
-			data.ServiceName = stName
-			data.ModelName = stName
-			data.DAOName = data.ModelName + "DAO"
-			data.TableName = snakecase.SnakeCase(stName) + "s"
-			// add the suite
-			serviceTemplate.Execute(out, data)
+    // iterate over structures
+    for stName, stVal := range file.Structs() {
+      // update suite name
+      data.ServiceName = stName
+      data.ModelName = stName
+      data.DAOName = data.ModelName + "DAO"
+      data.TableName = snakecase.SnakeCase(stName) + "s"
+      // add the suite
+      serviceTemplate.Execute(out, data)
 
-			for _, fieldVal := range stVal.Fields() {
+      for _, fieldVal := range stVal.Fields() {
 
-				var typeType int
-				data.FieldName = fieldVal.Name()
-				data.FieldType, typeType = fieldVal.Type()
-				//if it is not a gorm ID or one of
-				// the time parameters execute field template
-				if data.FieldName != "ID" &&
-					data.FieldName != "CreatedAt" &&
-					data.FieldName != "UpdatedAt" &&
-					data.FieldName != "DeletedAt" {
-					switch typeType {
-					case gogen.PrimitiveType:
-						simpleFieldTemplate.Execute(out, data)
-					case gogen.SliceType:
-						//sliceFieldTemplate.Execute(out, data) // support for slices is not yet finished
-					}
-				}
-			}
+        var typeType int
+        data.FieldName = fieldVal.Name()
+        data.FieldType, typeType = fieldVal.Type()
+        //if it is not a gorm ID or one of
+        // the time parameters execute field template
+        if data.FieldName != "ID" &&
+          data.FieldName != "CreatedAt" &&
+          data.FieldName != "UpdatedAt" &&
+          data.FieldName != "DeletedAt" {
+          switch typeType {
+          case gogen.PrimitiveType:
+            simpleFieldTemplate.Execute(out, data)
+          case gogen.SliceType:
+          //sliceFieldTemplate.Execute(out, data) // support for slices is not yet finished
+          }
+        }
+      }
 
-			// add suite test execution
-			footerTemplate.Execute(out, data)
-		}
-	}
+      // add suite test execution
+      footerTemplate.Execute(out, data)
+    }
+  }
 
-	return nil
+  return nil
 }

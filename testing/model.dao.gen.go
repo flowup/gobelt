@@ -1,11 +1,8 @@
-
 package testing
 
 import (
-	"github.com/jinzhu/gorm" 
+  "github.com/jinzhu/gorm"
 )
-
-
 
 /*
 @Init
@@ -13,21 +10,20 @@ import (
 
 // UserTestDAO is a data access object to a database containing UserTests
 type UserTestDAO struct {
-	db *gorm.DB
+  db *gorm.DB
 }
 
 // NewUserTestDAO creates a new Data Access Object for the
 // UserTest model.
-func NewUserTestDAO (db *gorm.DB) *UserTestDAO {
-	return &UserTestDAO{
-		db: db,
-	}
+func NewUserTestDAO(db *gorm.DB) *UserTestDAO {
+  return &UserTestDAO{
+    db: db,
+  }
 }
 
 /*
 @CRUD
 */
-
 
 // Create will create single UserTest in database.
 func (dao *UserTestDAO) Create(m *UserTest) {
@@ -44,7 +40,7 @@ func (dao *UserTestDAO) Read(m *UserTest) []UserTest {
 }
 
 // ReadByID will find UserTest by ID given by parameter
-func (dao *UserTestDAO) ReadByID(id uint64) *UserTest{
+func (dao *UserTestDAO) ReadByID(id uint64) *UserTest {
   m := &UserTest{}
   if dao.db.First(&m, id).RecordNotFound() {
     return nil
@@ -53,16 +49,15 @@ func (dao *UserTestDAO) ReadByID(id uint64) *UserTest{
   return m
 }
 
-
 // Update will update a record of UserTest in DB
-func (dao *UserTestDAO) Update(m *UserTest, id uint64) *UserTest{
-	oldVal := dao.ReadByID(id)
-	if oldVal == nil {
-		return nil
-	}
+func (dao *UserTestDAO) Update(m *UserTest, id uint64) *UserTest {
+  oldVal := dao.ReadByID(id)
+  if oldVal == nil {
+    return nil
+  }
 
-	dao.db.Model(&oldVal).Updates(m)
-	return oldVal
+  dao.db.Model(&oldVal).Updates(m)
+  return oldVal
 }
 
 // Delete will soft-delete a single UserTest
@@ -76,29 +71,29 @@ func (dao *UserTestDAO) Delete(m *UserTest) {
 
 // ReadByName will find all records
 // matching the value given by parameter
-func (dao *UserTestDAO) ReadByName (m string) []UserTest {
+func (dao *UserTestDAO) ReadByName(m string) []UserTest {
   retVal := []UserTest{}
-  dao.db.Where(&UserTest{ Name : m }).Find(&retVal)
+  dao.db.Where(&UserTest{Name: m}).Find(&retVal)
 
   return retVal
 }
 
 // DeleteByName deletes all records in database with
 // Name the same as parameter given
-func (dao *UserTestDAO) DeleteByName (m string) {
-  dao.db.Where(&UserTest{ Name : m }).Delete(&UserTest{})
+func (dao *UserTestDAO) DeleteByName(m string) {
+  dao.db.Where(&UserTest{Name: m}).Delete(&UserTest{})
 }
 
 // EditByName will edit all records in database
 // with the same Name as parameter given
 // using model given by parameter
-func (dao *UserTestDAO) EditByName (m string, newVals *UserTest) {
-  dao.db.Table("user_tests").Where(&UserTest{ Name : m }).Updates(newVals)
+func (dao *UserTestDAO) EditByName(m string, newVals *UserTest) {
+  dao.db.Table("user_tests").Where(&UserTest{Name: m}).Updates(newVals)
 }
 
 // SetName will set Name
 // to a value given by parameter
-func (dao *UserTestDAO) SetName (m *UserTest, newVal string) *UserTest {
+func (dao *UserTestDAO) SetName(m *UserTest, newVal string) *UserTest {
   m.Name = newVal
   record := dao.ReadByID(uint64(m.ID))
 
@@ -113,29 +108,29 @@ func (dao *UserTestDAO) SetName (m *UserTest, newVal string) *UserTest {
 
 // ReadByNumber will find all records
 // matching the value given by parameter
-func (dao *UserTestDAO) ReadByNumber (m int) []UserTest {
+func (dao *UserTestDAO) ReadByNumber(m int) []UserTest {
   retVal := []UserTest{}
-  dao.db.Where(&UserTest{ Number : m }).Find(&retVal)
+  dao.db.Where(&UserTest{Number: m}).Find(&retVal)
 
   return retVal
 }
 
 // DeleteByNumber deletes all records in database with
 // Number the same as parameter given
-func (dao *UserTestDAO) DeleteByNumber (m int) {
-  dao.db.Where(&UserTest{ Number : m }).Delete(&UserTest{})
+func (dao *UserTestDAO) DeleteByNumber(m int) {
+  dao.db.Where(&UserTest{Number: m}).Delete(&UserTest{})
 }
 
 // EditByNumber will edit all records in database
 // with the same Number as parameter given
 // using model given by parameter
-func (dao *UserTestDAO) EditByNumber (m int, newVals *UserTest) {
-  dao.db.Table("user_tests").Where(&UserTest{ Number : m }).Updates(newVals)
+func (dao *UserTestDAO) EditByNumber(m int, newVals *UserTest) {
+  dao.db.Table("user_tests").Where(&UserTest{Number: m}).Updates(newVals)
 }
 
 // SetNumber will set Number
 // to a value given by parameter
-func (dao *UserTestDAO) SetNumber (m *UserTest, newVal int) *UserTest {
+func (dao *UserTestDAO) SetNumber(m *UserTest, newVal int) *UserTest {
   m.Number = newVal
   record := dao.ReadByID(uint64(m.ID))
 
@@ -143,5 +138,3 @@ func (dao *UserTestDAO) SetNumber (m *UserTest, newVal int) *UserTest {
 
   return record
 }
-
-

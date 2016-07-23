@@ -1,15 +1,15 @@
 package observablegen
 
 import (
-	"html/template"
-	"os"
-	"path/filepath"
+  "html/template"
+  "os"
+  "path/filepath"
 
-	"github.com/flowup/gogen"
+  "github.com/flowup/gogen"
 )
 
 var (
-	observableTemplate = template.Must(template.New("observable").Parse(`
+  observableTemplate = template.Must(template.New("observable").Parse(`
 package {{.Package}}
 
 type {{.ModelName}}SubscriberFunc func(val []*{{.ModelName}})
@@ -61,39 +61,39 @@ func (s *{{.ModelName}}Subject) Next(val []*{{.ModelName}}) {
 
 // TemplateData is a data structure for the observable template
 type TemplateData struct {
-	Package   string
-	ModelName string
+  Package   string
+  ModelName string
 }
 
 func Generate(args []string) error {
-	for _, arg := range args {
-		// get the dir
-		path := filepath.Dir(arg)
+  for _, arg := range args {
+    // get the dir
+    path := filepath.Dir(arg)
 
-		// get the build
-		build, err := gogen.ParseFile(arg)
-		if err != nil {
-			return err
-		}
+    // get the build
+    build, err := gogen.ParseFile(arg)
+    if err != nil {
+      return err
+    }
 
-		// retrieve the file from the build
-		file := build.Files[arg]
+    // retrieve the file from the build
+    file := build.Files[arg]
 
-		data := TemplateData{
-			Package: file.Package(),
-		}
+    data := TemplateData{
+      Package: file.Package(),
+    }
 
-		for stName, _ := range file.Structs().Filter("@observable") {
-			out, err := os.Create(filepath.Join(path, stName+".observable.gen.go"))
-			if err != nil {
-				return err
-			}
+    for stName, _ := range file.Structs().Filter("@observable") {
+      out, err := os.Create(filepath.Join(path, stName + ".observable.gen.go"))
+      if err != nil {
+        return err
+      }
 
-			data.ModelName = stName
+      data.ModelName = stName
 
-			observableTemplate.Execute(out, data)
-		}
-	}
+      observableTemplate.Execute(out, data)
+    }
+  }
 
-	return nil
+  return nil
 }

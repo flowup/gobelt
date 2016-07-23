@@ -2,7 +2,7 @@ package testing
 
 import "github.com/jinzhu/gorm"
 
-// @observable
+// @observable --force
 type UserTest struct {
 	gorm.Model
 
