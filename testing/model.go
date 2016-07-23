@@ -2,9 +2,10 @@ package testing
 
 import "github.com/jinzhu/gorm"
 
+// @observable
 type UserTest struct {
-  gorm.Model
+	gorm.Model
 
-  Name string
-  Number int
+	Name   string
+	Number int
 }
