@@ -2,26 +2,31 @@
 
 > Warning: This project is still in development
 
-Gobelt is a code generator library written in Golang. It is based on models and can currently generate basic data access objects (DAOs) with tests for said models.
+Gobelt is a code generation tool written in Golang. It produces code based
+on existing Golang code. It is mainly focused on generating boilerplate and
+repetitive code such as test suites, data access objects or otherwise templated
+code like observables.
 
+## Contributing to Gobelt
 
-## Development guideline
+`Develop` branch of Gobelt has a dependency of [**Gogen**](https://github.com/flowup/gogen)
+also on branch `develop`. When issuing pull requests, please make sure you are
+building on top of the `develop` branch.
 
-Note: Currently you need to have branch "development" set up in [**Gogen libary**](https://github.com/flowup/gogen) in order for Gobelt to work.
-
-
-## Usage
-This library is used by installing it from source, running it with gobelt command and selecting one of available choices (currently dao or suite) and passing paths to models as arguments.
+## Installation
 
 ```cmd
+$ go get github.com/flowup/gobelt/cmd/gobelt
 
-$go get github.com/flowup/gobelt
-$go install ./cmd/gobelt/
-
-$gobelt dao $HOME/model.go
-
-// OR
-
-$gobelt suite $HOME/model.go
-
+$ gobelt # for usage information
 ```
+
+## Features
+
+- [x] Testify test suites
+- [x] Observables
+- [x] Data Access Objects (based on Gorm)
+- [ ] Map, Filter and Reduce operations
+- [ ] Data Access Objects (pure SQL)
+- [ ] Function RPC (for microservices)
+- [ ] More to come soon
