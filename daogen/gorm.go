@@ -41,7 +41,7 @@ func New{{.DAOName}} (db *gorm.DB) *{{.DAOName}} {
 }
 
 /*
-@CRUD
+Base CRUD operations.
 */
 
 
@@ -89,7 +89,7 @@ func (dao *{{.DAOName}}) Delete(m *{{.ModelPackage}}{{.ModelName}}) {
 
   simpleFieldTemplate = template.Must(template.New("simpleField").Parse(`
 /*
-@{{.FieldName}}
+{{.FieldName}} related operations.
 */
 
 // ReadBy{{.FieldName}} will find all records
@@ -127,6 +127,10 @@ func (dao *{{.DAOName}}) Set{{.FieldName}} (m *{{.ModelPackage}}{{.ModelName}}, 
 `))
 
   sliceFieldTemplate = template.Must(template.New("sliceField").Parse(`
+
+/*
+{{.FieldName}} related operations.
+*/
 
 func (dao *{{.DAOName}}) Add{{.FieldName}}Association (m *{{.ModelPackage}}{{.ModelName}}, asocVal {{.FieldType}}) *{{.ModelPackage}}{{.ModelName}} {
   dao.db.Model(&m).Association("{{.FieldName}}").Append(asocVal)
