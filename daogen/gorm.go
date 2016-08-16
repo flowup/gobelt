@@ -24,7 +24,7 @@ import (
   serviceTemplate = template.Must(template.New("service").Parse(`
 
 /*
-@Init
+Base DAO operations start
 */
 
 // {{.DAOName}} is a data access object to a database containing {{.ModelName}}s
