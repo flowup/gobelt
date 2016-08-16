@@ -1,4 +1,4 @@
-package __P__
+package daogen
 
 import (
   "github.com/jinzhu/gorm"
@@ -12,7 +12,7 @@ type __DAOName__ struct {
 
 // New__DAOName creates a new Data Access Object for the
 // __ReferenceModel__ model.
-func New__DAOName (db *gorm.DB) *__DAOName__ {
+func New__DAOName__ (db *gorm.DB) *__DAOName__ {
   return &__DAOName__{
     db:db,
   }

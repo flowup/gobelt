@@ -1,4 +1,4 @@
-package __P__
+package daogen
 
 
 // ReadBy__FieldPrimitive__ will find all records

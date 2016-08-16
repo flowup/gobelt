@@ -1,4 +1,4 @@
-package __P__
+package daogen
 
 // Add__FieldSlice__Association will add
 // an association to model given by parameter

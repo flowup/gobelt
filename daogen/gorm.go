@@ -182,16 +182,9 @@ func GenerateGorm(args []string) error {
     if err != nil {
       return err
     }
-
-    var splitPaths []string
-    var importString string
+    importString := strings.TrimLeft(absolutePath, os.Getenv("GOPATH")+"src")
     if runtime.GOOS == "windows" {
-      splitPaths = strings.SplitAfter(absolutePath, "src\\")
-      importString = splitPaths[len(splitPaths) - 1]
       importString = strings.Replace(importString, "\\", "/", -1)
-    } else {
-      splitPaths = strings.SplitAfter(absolutePath, "src/")
-      importString = splitPaths[len(splitPaths) - 1]
     }
 
     importString = strings.TrimRight(importString, "/" + name + ".go")
@@ -214,9 +207,6 @@ func GenerateGorm(args []string) error {
       ModelPackage:  modelPackage,
       ServiceName:   "",
       ProjectImport: importString,
-      // currently ProjectImport is parsed from path,
-      // should be parsed using gogen
-      // (could not work if a project has src/ directory in it)
     }
 
     // add header to the test file

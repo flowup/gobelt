@@ -1,4 +1,4 @@
-package __P__
+package daogen
 
 import "github.com/jinzhu/gorm"
 
