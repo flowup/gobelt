@@ -154,6 +154,7 @@ func GenerateGorm(args []string) error {
         }
       }
       // replace template names with the names of current structure
+      outputString = strings.Replace(outputString, "__reference_model__s", data.TableName, -1)
       outputString = strings.Replace(outputString, "__DAOName__", data.DAOName, -1)
       outputString = strings.Replace(outputString , "__ReferenceModel__", data.ModelPackage + data.ModelName, -1)
       outputString = strings.Replace(outputString, "__P__", data.Package, -1)
