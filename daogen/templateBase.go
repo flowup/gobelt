@@ -29,7 +29,7 @@ func (dao *__DAOName__) Read(m *__ReferenceModel__) []__ReferenceModel__ {
   retVal := []__ReferenceModel__{}
   dao.db.Where(m).Find(&retVal)
 
-return retVal
+  return retVal
 }
 
 // ReadByID will find __ReferenceModel__ by ID given by parameter
