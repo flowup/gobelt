@@ -5,12 +5,12 @@ import (
   // POSSIBLE IMPORT HERE
 )
 
-// __DAOName is a data access object to a database containing __ReferenceModel__s
+// __DAOName__ is a data access object to a database containing __ReferenceModel__s
 type __DAOName__ struct {
   db *gorm.DB
 }
 
-// New__DAOName creates a new Data Access Object for the
+// New__DAOName__ creates a new Data Access Object for the
 // __ReferenceModel__ model.
 func New__DAOName__ (db *gorm.DB) *__DAOName__ {
   return &__DAOName__{
