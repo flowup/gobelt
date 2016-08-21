@@ -23,6 +23,8 @@ type TemplateData struct {
   FieldType     string
 }
 
+// TODO if there are slices of user defined structs, parse the import string
+// and put slice template with replaced names to output
 func GenerateGorm(args []string) error {
   return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
     name := strings.Split(filepath.Base(filePath), ".")[0]
@@ -146,7 +148,7 @@ func GenerateGorm(args []string) error {
           case gogen.PrimitiveType:
             // compose functions for primitive types
             fieldOps = strings.Replace(primitiveString, "__PrimitiveType__", data.FieldType, -1)
-            fieldOps = strings.Replace(fieldOps, "__FieldPrimitive__", data.FieldName, -1)
+            fieldOps = strings.Replace(fieldOps, "FieldPrimitive__", data.FieldName, -1)
           case gogen.SliceType:
             // support for slices is not yet finished
           }

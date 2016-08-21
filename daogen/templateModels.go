@@ -14,6 +14,6 @@ type __AuxModel__ struct {
 type __ReferenceModel__ struct {
   gorm.Model
 
-  __FieldPrimitive__ __PrimitiveType__
-  __FieldSlice__ __SliceType__
+  FieldPrimitive__ __PrimitiveType__
+  FieldSlice__ __SliceType__
 }
