@@ -65,7 +65,7 @@ func (s *TemplateTestSuite) TestReadByID() {
     FieldPrimitive__:__PrimitiveType__(84),
   }
   s.db.Create(model)
-  get := s.dao.ReadByID(uint64(model.ID))
+  get := s.dao.ReadByID((model.ID))
   assert.NotEqual(s.T(), (*ReferenceModel__)(nil), get)
   assert.Equal(s.T(), __PrimitiveType__(84), get.FieldPrimitive__)
 }
@@ -80,7 +80,7 @@ func (s *TemplateTestSuite) TestUpdate() {
   newVal := &ReferenceModel__{
     FieldPrimitive__:__PrimitiveType__(40),
   }
-  update := s.dao.Update(newVal, uint64(list[0].ID))
+  update := s.dao.Update(newVal, (list[0].ID))
   assert.NotEqual(s.T(), (*ReferenceModel__)(nil), update)
   assert.Equal(s.T(), __PrimitiveType__(40), update.FieldPrimitive__)
 }

@@ -33,7 +33,7 @@ func (dao *__DAOName__) Read(m *ReferenceModel__) []ReferenceModel__ {
 }
 
 // ReadByID will find ReferenceModel__ by ID given by parameter
-func (dao *__DAOName__) ReadByID(id uint64) *ReferenceModel__{
+func (dao *__DAOName__) ReadByID(id uint) *ReferenceModel__{
   m := &ReferenceModel__{}
   if dao.db.First(&m, id).RecordNotFound() {
     return nil
@@ -44,7 +44,7 @@ func (dao *__DAOName__) ReadByID(id uint64) *ReferenceModel__{
 
 
 // Update will update a record of ReferenceModel__ in DB
-func (dao *__DAOName__) Update(m *ReferenceModel__, id uint64) *ReferenceModel__{
+func (dao *__DAOName__) Update(m *ReferenceModel__, id uint) *ReferenceModel__{
   oldVal := dao.ReadByID(id)
   if oldVal == nil {
     return nil

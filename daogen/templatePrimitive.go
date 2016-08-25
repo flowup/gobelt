@@ -27,7 +27,7 @@ func (dao *__DAOName__) EditByFieldPrimitive__ (m __PrimitiveType__, newVals *Re
 // to a value given by parameter
 func (dao *__DAOName__) SetFieldPrimitive__ (m *ReferenceModel__, newVal __PrimitiveType__) *ReferenceModel__ {
   m.FieldPrimitive__ = newVal
-  record := dao.ReadByID(uint64(m.ID))
+  record := dao.ReadByID((m.ID))
 
   dao.db.Model(&record).Updates(m)
 
