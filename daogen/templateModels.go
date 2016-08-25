@@ -8,10 +8,11 @@ type __SliceType__ []__AuxModel__
 type __AuxModel__ struct {
   gorm.Model
 
-  __AuxModelField__ __PrimitiveType__
+  ReferenceModel__ID uint
+  AuxModelField__ __PrimitiveType__
 }
 
-type __ReferenceModel__ struct {
+type ReferenceModel__ struct {
   gorm.Model
 
   FieldPrimitive__ __PrimitiveType__

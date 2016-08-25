@@ -106,14 +106,17 @@ func GenerateGorm(args []string) error {
     }
     primitiveString := strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
-
-    /*
     templateSlice, err := os.Open(openPath + "templateSlice.go")
     if err != nil {
       return err
     }
     defer templateSlice.Close()
-    */
+    sliceRead, err := ioutil.ReadAll(templateSlice)
+    if err != nil {
+      return err
+    }
+    sliceString := strings.TrimLeft((string)(sliceRead), "package daogen\n")
+
 
     // write the header containing package and imports into output file
     out.Write(([]byte)("package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n)"))
@@ -150,7 +153,8 @@ func GenerateGorm(args []string) error {
             fieldOps = strings.Replace(primitiveString, "__PrimitiveType__", data.FieldType, -1)
             fieldOps = strings.Replace(fieldOps, "FieldPrimitive__", data.FieldName, -1)
           case gogen.SliceType:
-            // support for slices is not yet finished
+            fieldOps = strings.Replace(sliceString, "__AuxModel__", data.ModelPackage + data.FieldType, -1)
+            fieldOps = strings.Replace(fieldOps, "FieldSlice__", data.FieldName, -1)
           }
           outputString += (fieldOps)
         }
