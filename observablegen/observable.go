@@ -10,7 +10,7 @@ import (
 
 // TemplateData is a data structure for the observable template
 type TemplateData struct {
-  Package   string
+  Package   string `template:"Package"`
   ModelName string `template:"TType"`
 }
 
@@ -28,13 +28,28 @@ func Generate(args []string) error {
       Package: file.Package(),
     }
 
+    // open template file
+    template, err := os.Open(gobelt.GetTemplatePath("observablegen/template.go"))
+    if err != nil {
+      return err
+    }
+    defer template.Close()
+
     for stName := range file.Structs().Filter("@observable") {
-      _, err := os.Create(filepath.Join(dir, stName + ".observable.gen.go"))
+      data.ModelName = stName
+
+      // create out file
+      out, err := os.Create(filepath.Join(dir, stName + ".observable.gen.go"))
       if err != nil {
         return err
       }
 
-      data.ModelName = stName
+      err = gobelt.ExecuteTemplate(template, out, &data)
+      if err != nil {
+        return err
+      }
+
+      out.Close()
     }
 
     return nil

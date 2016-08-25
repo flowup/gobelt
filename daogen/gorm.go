@@ -70,10 +70,7 @@ func GenerateGorm(args []string) error {
     }
 
     // compose template files path and open them
-    openPath := os.Getenv("GOPATH") + "/src/github.com/flowup/gobelt/daogen/"
-    if runtime.GOOS == "windows" {
-      openPath = strings.Replace(openPath, "/", "\\", -1)
-    }
+    openPath := gobelt.GetTemplatePath("daogen")
 
     templateBase, err := os.Open(openPath + "templateBase.go")
     if err != nil {
