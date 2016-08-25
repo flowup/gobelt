@@ -24,7 +24,7 @@ import (
 
 var cfgFile string
 
-// This represents the base command when called without any subcommands
+// RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
   Use:   "gobelt",
   Short: "A brief description of your application",

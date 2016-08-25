@@ -1,4 +1,4 @@
-package __P__
+package daogen
 
 import "github.com/jinzhu/gorm"
 
@@ -8,12 +8,13 @@ type __SliceType__ []__AuxModel__
 type __AuxModel__ struct {
   gorm.Model
 
-  __AuxModelField__ __PrimitiveType__
+  ReferenceModel__ID uint
+  AuxModelField__ __PrimitiveType__
 }
 
-type __ReferenceModel__ struct {
+type ReferenceModel__ struct {
   gorm.Model
 
-  __FieldPrimitive__ __PrimitiveType__
-  __FieldSlice__ __SliceType__
+  FieldPrimitive__ __PrimitiveType__
+  FieldSlice__ __SliceType__
 }
