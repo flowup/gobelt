@@ -72,7 +72,7 @@ func GenerateGorm(args []string) error {
     // compose template files path and open them
     openPath := gobelt.GetTemplatePath("daogen")
 
-    templateBase, err := os.Open(openPath + "templateBase.go")
+    templateBase, err := os.Open(openPath + "template_base.go")
     if err != nil {
       return err
     }
@@ -91,7 +91,7 @@ func GenerateGorm(args []string) error {
       baseString += lines[i]
     }
 
-    templatePrimitive, err := os.Open(openPath + "templatePrimitive.go")
+    templatePrimitive, err := os.Open(openPath + "template_primitive.go")
     if err != nil {
       return err
     }
@@ -103,7 +103,7 @@ func GenerateGorm(args []string) error {
     }
     primitiveString := strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
-    templateSlice, err := os.Open(openPath + "templateSlice.go")
+    templateSlice, err := os.Open(openPath + "template_slice.go")
     if err != nil {
       return err
     }
@@ -147,20 +147,19 @@ func GenerateGorm(args []string) error {
           switch typeType {
           case gogen.PrimitiveType:
             // compose functions for primitive types
-            fieldOps = strings.Replace(primitiveString, "__PrimitiveType__", data.FieldType, -1)
-            fieldOps = strings.Replace(fieldOps, "FieldPrimitive__", data.FieldName, -1)
+            fieldOps = strings.Replace(primitiveString, "PrimitiveType", data.FieldType, -1)
+            fieldOps = strings.Replace(fieldOps, "FieldPrimitive", data.FieldName, -1)
           case gogen.SliceType:
-            fieldOps = strings.Replace(sliceString, "__AuxModel__", data.ModelPackage + data.FieldType, -1)
-            fieldOps = strings.Replace(fieldOps, "FieldSlice__", data.FieldName, -1)
+            fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage + data.FieldType, -1)
+            fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
           }
           outputString += (fieldOps)
         }
       }
       // replace template names with the names of current structure
-      outputString = strings.Replace(outputString, "__reference_model__s", data.TableName, -1)
-      outputString = strings.Replace(outputString, "__DAOName__", data.DAOName, -1)
-      outputString = strings.Replace(outputString , "__ReferenceModel__", data.ModelPackage + data.ModelName, -1)
-      outputString = strings.Replace(outputString, "__P__", data.Package, -1)
+      outputString = strings.Replace(outputString, "reference_models", data.TableName, -1)
+      outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
+      outputString = strings.Replace(outputString , "ReferenceModel", data.ModelPackage + data.ModelName, -1)
 
       // write code for parsed struct to output file
       out.Write(([]byte)(outputString))
