@@ -11,11 +11,11 @@ import (
 // TemplateData is a data structure for the observable template
 type TemplateData struct {
   Package   string
-  ModelName string
+  ModelName string `template:"TType"`
 }
 
 // template structures
-type __T__ struct {}
+type TType struct {}
 
 // Generate parses all given files by args and generates observable
 // structures for structures annotated by @observable build tag
