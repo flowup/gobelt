@@ -72,7 +72,7 @@ func GenerateGorm(args []string) error {
     // compose template files path and open them
     openPath := gobelt.GetTemplatePath("daogen")
 
-    templateBase, err := os.Open(openPath + "template_base.go")
+    templateBase, err := os.Open(openPath + "/template_base.go")
     if err != nil {
       return err
     }
@@ -91,7 +91,7 @@ func GenerateGorm(args []string) error {
       baseString += lines[i]
     }
 
-    templatePrimitive, err := os.Open(openPath + "template_primitive.go")
+    templatePrimitive, err := os.Open(openPath + "/template_primitive.go")
     if err != nil {
       return err
     }
@@ -103,7 +103,7 @@ func GenerateGorm(args []string) error {
     }
     primitiveString := strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
-    templateSlice, err := os.Open(openPath + "template_slice.go")
+    templateSlice, err := os.Open(openPath + "/template_slice.go")
     if err != nil {
       return err
     }
