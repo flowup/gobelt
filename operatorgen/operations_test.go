@@ -30,12 +30,16 @@ func (s *TemplateTestSuite) SetupSuite() {
 // TestMap is testing functionality of Map function
 func (s *TemplateTestSuite) TestMap() {
 
-	tmp := s.array.Map(triple)
+	tmp := s.array.Map(func(num *TType) *TType {
+		return &TType{num.code * 3}
+	})
 	for i, element := range tmp {
 		assert.Equal(s.T(), MapResultArray1[i], element)
 	}
 
-	tmp = s.array.Map(pow)
+	tmp = s.array.Map(func(num *TType) *TType {
+		return &TType{num.code * num.code}
+	})
 	for i, element := range tmp {
 		assert.Equal(s.T(), MapResultArray2[i], element)
 	}
@@ -44,12 +48,22 @@ func (s *TemplateTestSuite) TestMap() {
 // TestFilter is testing functionality of Filter function
 func (s *TemplateTestSuite) TestFilter() {
 
-	tmp := s.array.Filter(even)
+	tmp := s.array.Filter(func(num *TType) bool {
+		if num.code%2 == 0 {
+			return true
+		}
+		return false
+	})
 	for i, element := range tmp {
 		assert.Equal(s.T(), FilterResultArray1[i], element)
 	}
 
-	tmp = s.array.Filter(odd)
+	tmp = s.array.Filter(func(num *TType) bool {
+		if num.code%2 != 0 {
+			return true
+		}
+		return false
+	})
 	for i, element := range tmp {
 		assert.Equal(s.T(), FilterResultArray2[i], element)
 	}
@@ -58,43 +72,10 @@ func (s *TemplateTestSuite) TestFilter() {
 // TestReduce is testing functionality of Reduce function
 func (s *TemplateTestSuite) TestReduce() {
 
-	tmp := s.array.Reduce(mul, &TType{1})
+	tmp := s.array.Reduce(func(a, b *TType) *TType {
+		return &TType{a.code * b.code}
+	}, &TType{1})
 	assert.Equal(s.T(), &TType{24}, tmp)
-}
-
-/*
- Example functions used in tests
-*/
-
-// triple functions triple the nums in struct
-func triple(num *TType) *TType {
-	return &TType{num.code * 3}
-}
-
-// pow is power the nums in struct
-func pow(num *TType) *TType {
-	return &TType{num.code * num.code}
-}
-
-// even is checking if num is even
-func even(num *TType) bool {
-	if num.code%2 == 0 {
-		return true
-	}
-	return false
-}
-
-// odd is checking if num is odd
-func odd(num *TType) bool {
-	if num.code%2 != 0 {
-		return true
-	}
-	return false
-}
-
-// mul is just multiplying numbers from two arrays and return result
-func mul(a, b *TType) *TType {
-	return &TType{a.code * b.code}
 }
 
 // Starting the test
