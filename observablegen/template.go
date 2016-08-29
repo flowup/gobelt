@@ -4,50 +4,50 @@
 // generated only if necessary
 package observablegen
 
-// __T__SubscriberFunc is a callback function
-// for the subscriber to the __T__ collection
-type __T__SubscriberFunc func(val []*__T__)
+// TTypeSubscriberFunc is a callback function
+// for the subscriber to the TType collection
+type TTypeSubscriberFunc func(val []*TType)
 
-// __T__Observable is an observable for the __T__Subject
-type __T__Observable struct {
-  subscribers []*__T__Subscriber
+// TTypeObservable is an observable for the TTypeSubject
+type TTypeObservable struct {
+  subscribers []*TTypeSubscriber
 }
 
 // Subscribe will add the subscriber into the observable
-func (o *__T__Observable) Subscribe(callback __T__SubscriberFunc) {
-  o.subscribers = append(o.subscribers, &__T__Subscriber{callback})
+func (o *TTypeObservable) Subscribe(callback TTypeSubscriberFunc) {
+  o.subscribers = append(o.subscribers, &TTypeSubscriber{callback})
 }
 
-// __T__Subscriber is an object that subscribes to the
-// changes of __T__Subject.
-type __T__Subscriber struct {
-  callback __T__SubscriberFunc
+// TTypeSubscriber is an object that subscribes to the
+// changes of TTypeSubject.
+type TTypeSubscriber struct {
+  callback TTypeSubscriberFunc
 }
 
 // Next pushes the value to the subscriber
-func (s *__T__Subscriber) Next(val []*__T__) {
+func (s *TTypeSubscriber) Next(val []*TType) {
   s.callback(val)
 }
 
-// __T__Subject is an entry point for changes of __T__
-type __T__Subject struct {
-  observable *__T__Observable
+// TTypeSubject is an entry point for changes of TType
+type TTypeSubject struct {
+  observable *TTypeObservable
 }
 
-// New__T__Subject returns a new Subject object for the
-// __T__.
-func New__T__Subject() *__T__Subject {
-  return &__T__Subject{&__T__Observable{nil}}
+// NewTTypeSubject returns a new Subject object for the
+// TType.
+func NewTTypeSubject() *TTypeSubject {
+  return &TTypeSubject{&TTypeObservable{nil}}
 }
 
-// AsObservable returns the observable object of the __T__Subject
-func (s *__T__Subject) AsObservable() *__T__Observable {
+// AsObservable returns the observable object of the TTypeSubject
+func (s *TTypeSubject) AsObservable() *TTypeObservable {
   return s.observable
 }
 
 // Next will push the given value to all subscribers of the
 // underlying observable
-func (s *__T__Subject) Next(val []*__T__) {
+func (s *TTypeSubject) Next(val []*TType) {
   for _, sub := range s.observable.subscribers {
     sub.Next(val)
   }
