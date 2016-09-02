@@ -24,21 +24,23 @@ type TType struct {
 func Generate(args []string) error {
 	return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
 		// retrieve the file from the build
-		file := build.Files[filePath]
-
-		data := TemplateData{
-			Package: file.Package(),
-		}
-
-		for stName := range file.Structs().Filter("@operations") {
-			_, err := os.Create(filepath.Join(dir, stName+".operations.gen.go"))
-			if err != nil {
-				return err
-			}
-
-			data.ModelName = stName
-		}
-
-		return nil
+		return FromFile(build.Files[filePath], dir)
 	})
+}
+
+func FromFile(file *gogen.File, targetDir string) error {
+	data := TemplateData{
+		Package: file.Package(),
+	}
+
+	for stName := range file.Structs().Filter("@operations") {
+		_, err := os.Create(filepath.Join(targetDir, stName+".operations.gen.go"))
+		if err != nil {
+			return err
+		}
+
+		data.ModelName = stName
+	}
+
+	return nil
 }
