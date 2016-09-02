@@ -23,6 +23,7 @@ import (
 	"github.com/flowup/gogen"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 func panicIf(err error) {
@@ -52,10 +53,15 @@ to quickly create a Cobra application.`,
 		for {
 			select {
 			case ev := <-watcher.Events:
+				if !strings.HasSuffix(ev.Name, ".go") {
+					// these are temporary files or others created by IDE's
+					continue
+				}
+
 				fmt.Println("Triggered generator for ", ev.Name)
 				build, err := gogen.ParseFile(ev.Name)
 				if err != nil {
-					fmt.Println("Build error occured")
+					fmt.Println("Build error occured:", err.Error())
 					return
 				}
 
