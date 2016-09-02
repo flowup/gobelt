@@ -10,8 +10,8 @@ import (
 
 // TemplateData is a data structure for the operations template
 type TemplateData struct {
-	Package   string
-	ModelName string
+	Package   string `template:"Package"`
+	ModelName string `template:"TType"`
 }
 
 // TType template structures
@@ -33,13 +33,25 @@ func FromFile(file *gogen.File, targetDir string) error {
 		Package: file.Package(),
 	}
 
+	template, err := os.Open(gobelt.GetTemplatePath("operatorgen/template.go"))
+	if err != nil {
+		return err
+	}
+
 	for stName := range file.Structs().Filter("@operations") {
-		_, err := os.Create(filepath.Join(targetDir, stName+".operations.gen.go"))
+		out, err := os.Create(filepath.Join(targetDir, stName+".operations.gen.go"))
 		if err != nil {
 			return err
 		}
 
 		data.ModelName = stName
+
+		err = gobelt.ExecuteTemplate(template, out, &data)
+		if err != nil {
+			return err
+		}
+
+		out.Close()
 	}
 
 	return nil
