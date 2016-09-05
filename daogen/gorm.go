@@ -96,7 +96,6 @@ func GenerateGorm(args []string) error {
       return err
     }
     defer templatePrimitive.Close()
-
     primitiveRead, err := ioutil.ReadAll(templatePrimitive)
     if err != nil {
       return err
@@ -114,6 +113,16 @@ func GenerateGorm(args []string) error {
     }
     sliceString := strings.TrimLeft((string)(sliceRead), "package daogen\n")
 
+		templateStruct, err := os.Open(openPath + "/template_struct.go")
+		if err != nil {
+			return err
+		}
+		defer templateStruct.Close()
+		structRead, err := ioutil.ReadAll(templateStruct)
+		if err != nil{
+			return err
+		}
+		structString := strings.TrimLeft((string)(structRead), "package daogen\n")
 
     // write the header containing package and imports into output file
     out.Write(([]byte)("package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n)"))
@@ -143,14 +152,18 @@ func GenerateGorm(args []string) error {
           data.FieldName != "DeletedAt" {
 
           var fieldOps string
-
           switch typeType {
+					case gogen.SelectorType:
+						// compose functions for struct types
+						fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
+						fieldOps = strings.Replace(fieldOps, "StructType", data.FieldType, -1)
           case gogen.PrimitiveType:
             // compose functions for primitive types
             fieldOps = strings.Replace(primitiveString, "PrimitiveType", data.FieldType, -1)
             fieldOps = strings.Replace(fieldOps, "FieldPrimitive", data.FieldName, -1)
           case gogen.SliceType:
-            fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage + data.FieldType, -1)
+						// compose functions for array types
+            fieldOps = strings.Replace(sliceString, "StructType", data.ModelPackage + data.FieldType, -1)
             fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
           }
           outputString += (fieldOps)
