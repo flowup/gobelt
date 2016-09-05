@@ -2,7 +2,6 @@ package gobelt
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -48,14 +47,8 @@ func GetTemplatePath(gen string) string {
 
 // ExecuteTemplate writes a template into the given writer.
 // Template data will be replaced by given tags
-func ExecuteTemplate(template io.Reader, out io.Writer, data interface{}) error {
+func ExecuteTemplate(templateBytes []byte, out io.Writer, data interface{}) error {
 	st := reflect.ValueOf(data).Elem()
-
-	// templateBytes
-	templateBytes, err := ioutil.ReadAll(template)
-	if err != nil {
-		return err
-	}
 
 	templateData := string(templateBytes)
 
@@ -82,7 +75,7 @@ func ExecuteTemplate(template io.Reader, out io.Writer, data interface{}) error 
 		templateData = strings.Replace(templateData, templateTag, value, -1)
 	}
 
-	_, err = out.Write([]byte(templateData))
+	_, err := out.Write([]byte(templateData))
 
 	return err
 }

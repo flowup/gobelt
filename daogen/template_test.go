@@ -143,9 +143,9 @@ func (s *TemplateTestSuite) TestAssociations() {
 }
 
 func (s *TemplateTestSuite) TearDownSuite() {
-  /*for i := range s.testCases {
+  for i := range s.testCases {
     s.db.Unscoped().Delete(&s.testCases[i])
-  }*/
+  }
 }
 
 func TestTemplateTestSuite(t *testing.T) {

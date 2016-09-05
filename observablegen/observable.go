@@ -6,6 +6,7 @@ import (
 
   "github.com/flowup/gogen"
   "github.com/flowup/gobelt"
+	"github.com/flowup/gobelt/template_manager"
 )
 
 // TemplateData is a data structure for the observable template
@@ -29,11 +30,7 @@ func Generate(args []string) error {
     }
 
     // open template file
-    template, err := os.Open(gobelt.GetTemplatePath("observablegen/template.go"))
-    if err != nil {
-      return err
-    }
-    defer template.Close()
+    template := templateManager.GetInstance().LoadTemplate("observablegen/template.go")
 
     for stName := range file.Structs().Filter("@observable") {
       data.ModelName = stName

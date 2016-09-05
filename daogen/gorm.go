@@ -7,8 +7,8 @@ import (
   "strings"
   "github.com/azer/snakecase"
   "github.com/flowup/gogen"
-  "io/ioutil"
   "github.com/flowup/gobelt"
+	"github.com/flowup/gobelt/template_manager"
 )
 
 type TemplateData struct {
@@ -69,21 +69,11 @@ func GenerateGorm(args []string) error {
       ProjectImport: importString,
     }
 
+		manager := templateManager.GetInstance()
     // compose template files path and open them
-    openPath := gobelt.GetTemplatePath("daogen")
-
-    templateBase, err := os.Open(openPath + "/template_base.go")
-    if err != nil {
-      return err
-    }
-    defer templateBase.Close()
-
 
     var baseString string
-    baseBytes, err := ioutil.ReadAll(templateBase)
-    if err != nil {
-      return err
-    }
+    baseBytes := manager.LoadTemplate("daogen/template_base.go")
 
     // skip the import and package section
     lines := strings.Split((string)(baseBytes), "\n)")
@@ -91,37 +81,14 @@ func GenerateGorm(args []string) error {
       baseString += lines[i]
     }
 
-    templatePrimitive, err := os.Open(openPath + "/template_primitive.go")
-    if err != nil {
-      return err
-    }
-    defer templatePrimitive.Close()
-    primitiveRead, err := ioutil.ReadAll(templatePrimitive)
-    if err != nil {
-      return err
-    }
+
+    primitiveRead := manager.LoadTemplate("daogen/template_primitive.go")
     primitiveString := strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
-    templateSlice, err := os.Open(openPath + "/template_slice.go")
-    if err != nil {
-      return err
-    }
-    defer templateSlice.Close()
-    sliceRead, err := ioutil.ReadAll(templateSlice)
-    if err != nil {
-      return err
-    }
+    sliceRead := manager.LoadTemplate("daogen/template_slice.go")
     sliceString := strings.TrimLeft((string)(sliceRead), "package daogen\n")
 
-		templateStruct, err := os.Open(openPath + "/template_struct.go")
-		if err != nil {
-			return err
-		}
-		defer templateStruct.Close()
-		structRead, err := ioutil.ReadAll(templateStruct)
-		if err != nil{
-			return err
-		}
+		structRead := manager.LoadTemplate("daogen/template_struct.go")
 		structString := strings.TrimLeft((string)(structRead), "package daogen\n")
 
     // write the header containing package and imports into output file
