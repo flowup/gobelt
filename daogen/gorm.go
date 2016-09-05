@@ -92,14 +92,12 @@ func GenerateGorm(args []string) error {
 		structRead := filecache.Cache.LoadFile(templatePath + "/template_struct.go")
 		structString := strings.TrimLeft((string)(structRead), "package daogen\n")
 
-    // write the header containing package and imports into output file
-    out.Write(([]byte)("package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n)"))
-
-    var outputString string
+		neededPackages := make(map[string]bool)
+    var outputStrings []string
     // iterate over structures
     for stName, stVal := range file.Structs() {
       // reset outputString to base template
-      outputString = baseString
+      outputString := baseString
 
       // update suite name
       data.ServiceName = stName
@@ -121,9 +119,10 @@ func GenerateGorm(args []string) error {
 
           var fieldOps string
           switch typeType {
-					case gogen.StructType:
-						fallthrough
 					case gogen.SelectorType:
+						neededPackages[strings.Split(data.FieldType, ".")[0]] = true
+						fallthrough
+					case gogen.StructType:
 						// compose functions for struct types
 						fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
 						fieldOps = strings.Replace(fieldOps, "AuxModel", data.FieldType, -1)
@@ -144,10 +143,21 @@ func GenerateGorm(args []string) error {
       outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
       outputString = strings.Replace(outputString , "ReferenceModel", data.ModelPackage + data.ModelName, -1)
 
-      // write code for parsed struct to output file
-      out.Write(([]byte)(outputString))
+      outputStrings = append(outputStrings, outputString)
     }
+		generatedStr := "package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n  "
+		for pack := range neededPackages {
+			if i := file.Import(pack); i != nil {
+				generatedStr += i.String() + "\n  "
+			}
+		}
+		generatedStr += "\n)\n"
+		for _, str := range outputStrings {
+			generatedStr += str
+		}
 
+		// write code for parsed struct to output file
+		out.Write(([]byte)(generatedStr))
     return nil
   })
 }
