@@ -24,7 +24,7 @@ type TType struct {
 func Generate(args []string) error {
 	return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
 		// retrieve the file from the build
-		return FromFile(build.Files[filePath], dir)
+		return FromFile(build.File(filePath), dir)
 	})
 }
 

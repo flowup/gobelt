@@ -22,7 +22,7 @@ type TType struct {}
 func Generate(args []string) error {
   return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
     // retrieve the file from the build
-    file := build.Files[filePath]
+    file := build.File(filePath)
 
     data := TemplateData{
       Package: file.Package(),

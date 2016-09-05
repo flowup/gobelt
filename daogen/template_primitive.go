@@ -33,3 +33,4 @@ func (dao *DAOName) SetFieldPrimitive (m *ReferenceModel, newVal PrimitiveType) 
 
   return record
 }
+

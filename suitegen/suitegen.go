@@ -87,7 +87,7 @@ func Generate(args []string) error {
     }
 
     // retrieve the file from the build
-    file := build.Files[arg]
+    file := build.File(arg)
 
     // initialize the data structure
     data := TemplateData{

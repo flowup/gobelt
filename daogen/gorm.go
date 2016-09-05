@@ -50,7 +50,7 @@ func GenerateGorm(args []string) error {
     importString = strings.TrimRight(importString, "/" + name + ".go")
 
     // retrieve the file from the build
-    file := build.Files[filePath]
+    file := build.File(filePath)
 
     var modelPackage string
     if pwd == file.Package() {
@@ -163,7 +163,7 @@ func GenerateGorm(args []string) error {
             fieldOps = strings.Replace(fieldOps, "FieldPrimitive", data.FieldName, -1)
           case gogen.SliceType:
 						// compose functions for array types
-            fieldOps = strings.Replace(sliceString, "StructType", data.ModelPackage + data.FieldType, -1)
+            fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage + data.FieldType, -1)
             fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
           }
           outputString += (fieldOps)

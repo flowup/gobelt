@@ -42,7 +42,6 @@ func (dao *DAOName) ReadByID(id uint) *ReferenceModel{
   return m
 }
 
-
 // Update will update a record of ReferenceModel in DB
 func (dao *DAOName) Update(m *ReferenceModel, id uint) *ReferenceModel{
   oldVal := dao.ReadByID(id)
@@ -58,3 +57,4 @@ func (dao *DAOName) Update(m *ReferenceModel, id uint) *ReferenceModel{
 func (dao *DAOName) Delete(m *ReferenceModel) {
   dao.db.Delete(m)
 }
+

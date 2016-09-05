@@ -65,7 +65,7 @@ to quickly create a Cobra application.`,
 					return
 				}
 
-				fileBuild := build.Files[filepath.Base(ev.Name)]
+				fileBuild := build.File(filepath.Base(ev.Name))
 				targetDir := filepath.Dir(path)
 
 				if err = operatorgen.FromFile(fileBuild, targetDir); err != nil {
