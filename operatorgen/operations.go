@@ -6,7 +6,7 @@ import (
 
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
-	"github.com/flowup/gobelt/template_manager"
+	"flowdock.eu/services/filecache"
 )
 
 // TemplateData is a data structure for the operations template
@@ -34,7 +34,7 @@ func FromFile(file *gogen.File, targetDir string) error {
 		Package: file.Package(),
 	}
 
-	template := templateManager.GetInstance().LoadTemplate("operatorgen/template.go")
+	template := filecache.Cache.LoadFile(gobelt.GetTemplatePath("operatorgen") + "/template.go")
 
 	for stName := range file.Structs().Filter("@operations") {
 		out, err := os.Create(filepath.Join(targetDir, stName+".operations.gen.go"))
