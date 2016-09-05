@@ -153,10 +153,12 @@ func GenerateGorm(args []string) error {
 
           var fieldOps string
           switch typeType {
+					case gogen.StructType:
+						fallthrough
 					case gogen.SelectorType:
 						// compose functions for struct types
 						fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
-						fieldOps = strings.Replace(fieldOps, "StructType", data.FieldType, -1)
+						fieldOps = strings.Replace(fieldOps, "AuxModel", data.FieldType, -1)
           case gogen.PrimitiveType:
             // compose functions for primitive types
             fieldOps = strings.Replace(primitiveString, "PrimitiveType", data.FieldType, -1)

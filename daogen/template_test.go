@@ -98,6 +98,26 @@ func (s *TemplateTestSuite) TestDelete() {
   assert.Equal(s.T(), 0, len(list))
 }
 
+func (s *TemplateTestSuite) TestStruct() {
+	model := &ReferenceModel{
+		FieldPrimitive: PrimitiveType(5),
+	}
+	list := s.dao.Read(model)
+	assert.NotNil(s.T(), list)
+	assert.Equal(s.T(), 1, len(list))
+	model = &list[0]
+
+	assoc := AuxModel{
+		AuxModelField: PrimitiveType(20),
+	}
+	model = s.dao.SetFieldStruct(model, assoc)
+	assoc = model.FieldStruct
+	assert.NotNil(s.T(), model)
+	assert.Equal(s.T(), PrimitiveType(20), assoc.AuxModelField)
+	assert.Equal(s.T(), model.ID, assoc.ReferenceModelID)
+	assert.Equal(s.T(), model.FieldStruct, assoc)
+}
+
 func (s *TemplateTestSuite) TestAssociations() {
   model := &ReferenceModel{
     FieldPrimitive: PrimitiveType(4),
@@ -123,9 +143,9 @@ func (s *TemplateTestSuite) TestAssociations() {
 }
 
 func (s *TemplateTestSuite) TearDownSuite() {
-  for i := range s.testCases {
+  /*for i := range s.testCases {
     s.db.Unscoped().Delete(&s.testCases[i])
-  }
+  }*/
 }
 
 func TestTemplateTestSuite(t *testing.T) {

@@ -4,7 +4,6 @@ import "github.com/jinzhu/gorm"
 
 type PrimitiveType int
 type SliceType []AuxModel
-type StructType AuxModel
 
 type AuxModel struct {
   gorm.Model
@@ -16,7 +15,7 @@ type AuxModel struct {
 type ReferenceModel struct {
   gorm.Model
 
-	FieldStruct StructType
+	FieldStruct AuxModel
   FieldPrimitive PrimitiveType
   FieldSlice SliceType
 }
