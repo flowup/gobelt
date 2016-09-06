@@ -8,7 +8,7 @@ import (
   "github.com/azer/snakecase"
   "github.com/flowup/gogen"
   "github.com/flowup/gobelt"
-	"github.com/flowup/gobelt/template_manager"
+	"flowdock.eu/services/filecache"
 )
 
 type TemplateData struct {
@@ -69,11 +69,12 @@ func GenerateGorm(args []string) error {
       ProjectImport: importString,
     }
 
-		manager := templateManager.GetInstance()
     // compose template files path and open them
 
     var baseString string
-    baseBytes := manager.LoadTemplate("daogen/template_base.go")
+
+		templatePath := gobelt.GetTemplatePath("daogen")
+    baseBytes := filecache.Cache.LoadFile(templatePath + "/template_base.go")
 
     // skip the import and package section
     lines := strings.Split((string)(baseBytes), "\n)")
@@ -82,13 +83,13 @@ func GenerateGorm(args []string) error {
     }
 
 
-    primitiveRead := manager.LoadTemplate("daogen/template_primitive.go")
+    primitiveRead := filecache.Cache.LoadFile(templatePath + "/template_primitive.go")
     primitiveString := strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
-    sliceRead := manager.LoadTemplate("daogen/template_slice.go")
+    sliceRead := filecache.Cache.LoadFile(templatePath + "/template_slice.go")
     sliceString := strings.TrimLeft((string)(sliceRead), "package daogen\n")
 
-		structRead := manager.LoadTemplate("daogen/template_struct.go")
+		structRead := filecache.Cache.LoadFile(templatePath + "/template_struct.go")
 		structString := strings.TrimLeft((string)(structRead), "package daogen\n")
 
     // write the header containing package and imports into output file
