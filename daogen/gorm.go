@@ -31,26 +31,23 @@ func GenerateGorm(args []string) error {
     absolutePath, _ := filepath.Abs(dir)
 
     // create file for output
-    out, err := os.Create(filepath.Join(dir, name + ".dao.gen.go"))
+		pwdBase, err := os.Getwd()
+		pwd := filepath.Base(pwdBase)
+    out, err := os.Create(filepath.Join(pwdBase, name + ".dao.gen.go"))
     if err != nil {
       return err
     }
     defer out.Close()
 
-
-    pwd, err := os.Getwd()
-    pwd = filepath.Base(pwd)
-
     // parse import string using $GOPATH
-    importString := strings.TrimLeft(absolutePath, os.Getenv("GOPATH")+"src")
-    if runtime.GOOS == "windows" {
+    //importString := strings.TrimLeft(absolutePath, os.Getenv("GOPATH")+"src")
+		importString := absolutePath[len(os.Getenv("GOPATH") + "/src/"):]
+		if runtime.GOOS == "windows" {
       importString = strings.Replace(importString, "\\", "/", -1)
     }
 
-    importString = strings.TrimRight(importString, "/" + name + ".go")
-
     // retrieve the file from the build
-    file := build.File(filePath)
+    file := build.File(filepath.Base(filePath))
 
     var modelPackage string
     if pwd == file.Package() {
