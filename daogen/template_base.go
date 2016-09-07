@@ -58,3 +58,10 @@ func (dao *DAOName) Delete(m *ReferenceModel) {
   dao.db.Delete(m)
 }
 
+// GetAll will return all records of ReferenceModel in database
+func (dao *DAOName) GetAll() []ReferenceModel {
+	m := []ReferenceModel{}
+	dao.db.Find(&m)
+
+	return m
+}
