@@ -142,10 +142,10 @@ func GenerateGorm(args []string) error {
 
       outputStrings = append(outputStrings, outputString)
     }
-		generatedStr := "package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n  "
+		generatedStr := "package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\"\n  \"time\"" + data.ProjectImport + "\n  "
 		for _, pack := range neededPackages {
-			if i := file.Import(pack); i != nil {
-				generatedStr += i.String() + "\n  "
+			if i := file.Import(pack); i != nil && pack != "time" {
+				generatedStr += "  " + i.String() + "\n"
 			}
 		}
 		generatedStr += ")\n"

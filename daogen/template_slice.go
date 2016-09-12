@@ -16,4 +16,9 @@ func (dao *DAOName) RemoveFieldSliceAssociation (m *ReferenceModel, asocVal *Aux
   return m
 }
 
+func (dao *DAOName) GetAllAssociatedFieldSlice (m *ReferenceModel) []AuxModel {
+	retVal := []AuxModel{}
 
+	dao.db.Model(&m).Related(&retVal)
+	return retVal
+}
