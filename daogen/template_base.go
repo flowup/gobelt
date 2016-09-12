@@ -3,6 +3,7 @@ package daogen
 import (
   "github.com/jinzhu/gorm"
   // POSSIBLE IMPORT HERE
+	"time"
 )
 
 // DAOName is a data access object to a database containing ReferenceModels
@@ -56,6 +57,14 @@ func (dao *DAOName) Update(m *ReferenceModel, id uint) *ReferenceModel{
 // Delete will soft-delete a single ReferenceModel
 func (dao *DAOName) Delete(m *ReferenceModel) {
   dao.db.Delete(m)
+}
+
+// GetUpdatedAfter will return all ReferenceModels that were
+// updated after given timestamp
+func (dao *DAOName) GetUpdatedAfter(timestamp time.Time) []ReferenceModel {
+	m := []ReferenceModel{}
+	dao.db.Where("updated_at > ?", timestamp).Find(&m)
+	return m
 }
 
 // GetAll will return all records of ReferenceModel in database

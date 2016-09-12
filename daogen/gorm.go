@@ -89,7 +89,7 @@ func GenerateGorm(args []string) error {
 		structRead := filecache.Cache.LoadFile(templatePath + "/template_struct.go")
 		structString := strings.TrimLeft((string)(structRead), "package daogen\n")
 
-		neededPackages := make(map[string]bool)
+		var neededPackages []string
     var outputStrings []string
     // iterate over structures
     for stName, stVal := range file.Structs() {
@@ -117,7 +117,7 @@ func GenerateGorm(args []string) error {
           var fieldOps string
           switch typeType {
 					case gogen.SelectorType:
-						neededPackages[strings.Split(data.FieldType, ".")[0]] = true
+						neededPackages = append(neededPackages, strings.Split(data.FieldType, ".")[0])
 						fallthrough
 					case gogen.StructType:
 						// compose functions for struct types
@@ -143,12 +143,12 @@ func GenerateGorm(args []string) error {
       outputStrings = append(outputStrings, outputString)
     }
 		generatedStr := "package " + data.Package + "\n\nimport(\n  \"github.com/jinzhu/gorm\""   + data.ProjectImport + "\n  "
-		for pack := range neededPackages {
+		for _, pack := range neededPackages {
 			if i := file.Import(pack); i != nil {
 				generatedStr += i.String() + "\n  "
 			}
 		}
-		generatedStr += "\n)\n"
+		generatedStr += ")\n"
 		for _, str := range outputStrings {
 			generatedStr += str
 		}
