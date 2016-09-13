@@ -8,7 +8,7 @@ import (
   "github.com/azer/snakecase"
   "github.com/flowup/gogen"
   "github.com/flowup/gobelt"
-	"flowdock.eu/services/filecache"
+	"flowdock.eu/flowup/services/filecache"
 )
 
 type TemplateData struct {
