@@ -14,7 +14,6 @@ import (
 type TemplateData struct {
   Package       string
   ModelPackage  string
-  ServiceName   string
   ModelName     string
   ProjectImport string
   DAOName       string
@@ -27,7 +26,7 @@ type TemplateData struct {
 // and put slice template with replaced names to output
 func GenerateGorm(args []string) error {
   return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
-    name := strings.Split(filepath.Base(filePath), ".")[0]
+		name := strings.Split(filepath.Base(filePath), ".")[0]
     absolutePath, _ := filepath.Abs(dir)
 
     // create file for output
@@ -45,24 +44,25 @@ func GenerateGorm(args []string) error {
 		if runtime.GOOS == "windows" {
       importString = strings.Replace(importString, "\\", "/", -1)
     }
-
     // retrieve the file from the build
-    file := build.File(filepath.Base(filePath))
+		file := build.File(filepath.Base(filePath))
 
     var modelPackage string
-    if pwd == file.Package() {
-      modelPackage = ""
+		var pack string
+    if absolutePath == pwdBase {
+      pack = file.Package()
+			modelPackage = ""
       importString = ""
     } else {
+			pack = pwd
       modelPackage = file.Package() + "."
       importString = "\n  \"" + importString + "\""
     }
 
     // initialize the data structure
     data := TemplateData{
-      Package:       pwd,
+      Package:       pack,
       ModelPackage:  modelPackage,
-      ServiceName:   "",
       ProjectImport: importString,
     }
 
@@ -92,12 +92,11 @@ func GenerateGorm(args []string) error {
 		var neededPackages []string
     var outputStrings []string
     // iterate over structures
-    for stName, stVal := range file.Structs() {
+    for stName, stVal := range file.Structs().Filter("@dao") {
       // reset outputString to base template
       outputString := baseString
 
       // update suite name
-      data.ServiceName = stName
       data.ModelName = stName
       data.DAOName = data.ModelName + "DAO"
       data.TableName = snakecase.SnakeCase(stName) + "s"
@@ -138,7 +137,7 @@ func GenerateGorm(args []string) error {
       // replace template names with the names of current structure
       outputString = strings.Replace(outputString, "reference_models", data.TableName, -1)
       outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
-      outputString = strings.Replace(outputString , "ReferenceModel", data.ModelPackage + data.ModelName, -1)
+      outputString = strings.Replace(outputString, "ReferenceModel", data.ModelPackage + data.ModelName, -1)
 
       outputStrings = append(outputStrings, outputString)
     }
