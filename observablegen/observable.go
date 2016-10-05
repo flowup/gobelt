@@ -23,11 +23,16 @@ type TType struct {}
 func Generate(args []string) error {
   return gobelt.Generate(args, func(build *gogen.Build, filePath, dir string) error {
     // retrieve the file from the build
-    file := build.File(filePath)
+    file := build.File(filepath.Base(filePath))
 
     data := TemplateData{
       Package: file.Package(),
     }
+
+		pwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
 
     // open template file
     template := filecache.Cache.LoadFile(gobelt.GetTemplatePath("observablegen") + "/template.go")
@@ -36,7 +41,7 @@ func Generate(args []string) error {
       data.ModelName = stName
 
       // create out file
-      out, err := os.Create(filepath.Join(dir, stName + ".observable.gen.go"))
+      out, err := os.Create(filepath.Join(pwd, stName + ".observable.gen.go"))
       if err != nil {
         return err
       }
