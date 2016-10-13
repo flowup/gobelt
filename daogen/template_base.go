@@ -54,6 +54,13 @@ func (dao *DAOName) Update(m *ReferenceModel, id uint) *ReferenceModel{
   return oldVal
 }
 
+// UpdateAllFields will update ALL fields of ReferenceModel in db
+// with values given in the ReferenceModel by parameter
+func (dao *DAOName) UpdateAllFields(m *ReferenceModel) *ReferenceModel{
+	dao.db.Save(&m)
+	return m
+}
+
 // Delete will soft-delete a single ReferenceModel
 func (dao *DAOName) Delete(m *ReferenceModel) {
   dao.db.Delete(m)
