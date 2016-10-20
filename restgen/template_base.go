@@ -40,7 +40,7 @@ func NewReferenceModelController(c *ReferenceModelControllerConfig) *ReferenceMo
 	}
 }
 
-func (c *ReferenceModelController) Create(ctx *iris.Context) error {
+func (c *ReferenceModelController) Create(ctx *iris.Context) {
 	input := &[]ReferenceModel{}
 	if err := ctx.ReadJSON(input); err != nil {
 		response := []response{{Message: "Could not read input JSON"}}
@@ -56,7 +56,7 @@ func (c *ReferenceModelController) Create(ctx *iris.Context) error {
 	return
 }
 
-func (c *ReferenceModelController) Read(ctx *iris.Context) error {
+func (c *ReferenceModelController) Read(ctx *iris.Context) {
 	input := &[]ReferenceModel{}
 	output := []ReferenceModel{}
 	var auxArray []ReferenceModel
@@ -79,7 +79,7 @@ func (c *ReferenceModelController) Read(ctx *iris.Context) error {
 	return
 }
 
-func (c *ReferenceModelController) Update(ctx *iris.Context) error {
+func (c *ReferenceModelController) Update(ctx *iris.Context) {
 	input := &[]ReferenceModel{}
 	output := []ReferenceModel{}
 	var auxModel *ReferenceModel
@@ -98,7 +98,7 @@ func (c *ReferenceModelController) Update(ctx *iris.Context) error {
 	return
 }
 
-func (c *ReferenceModelController) Delete(ctx *iris.Context) error {
+func (c *ReferenceModelController) Delete(ctx *iris.Context) {
 	input := &[]ReferenceModel{}
 	if err := ctx.ReadJSON(input); err != nil {
 		response := []response{{Message: "Could not read input JSON"}}
