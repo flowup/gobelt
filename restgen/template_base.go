@@ -1,13 +1,9 @@
 package restgen
 
 import (
-	"github.com/labstack/echo"
-	"net/http"
+	"github.com/kataras/iris"
 )
 
-type ReferenceModelArray struct {
-	array []ReferenceModel
-}
 
 type ReferenceModelController struct {
 	config *ReferenceModelControllerConfig
@@ -24,9 +20,13 @@ type DAOInterface interface {
 	Delete(m *ReferenceModel)
 }
 
-func (a ReferenceModelArray) contains(m *ReferenceModel) bool {
-	for i := range a.array {
-		if a.array[i] == m {
+type response struct {
+	Message string `json:"error"`
+}
+
+func contains(a []ReferenceModel, m ReferenceModel) bool {
+	for i := range a {
+		if a[i] == *m {
 			return true
 		}
 	}
@@ -40,56 +40,77 @@ func NewReferenceModelController(c *ReferenceModelControllerConfig) *ReferenceMo
 	}
 }
 
-func (c *ReferenceModelController) Create(e echo.Context) error {
-	input := ReferenceModelArray{}
-	e.Bind(&input)
-
-	for i := range input.array {
-		c.config.dao.Create(&input.array[i])
+func (c *ReferenceModelController) Create(ctx *iris.Context) error {
+	input := &[]ReferenceModel{}
+	if err := ctx.ReadJSON(input); err != nil {
+		response := []response{{Message: "Could not read input JSON"}}
+		ctx.JSON(iris.StatusBadRequest, response)
+		return
 	}
 
-	return e.JSON(http.StatusOK, &input)
+	for _, item := range *input {
+		c.config.dao.Create(&item)
+	}
+
+	ctx.JSON(iris.StatusOK, input)
+	return
 }
 
-func (c *ReferenceModelController) Read(e echo.Context) error {
-	input := ReferenceModelArray{}
-	output := ReferenceModelArray{}
-	auxArray := []ReferenceModel{}
-	e.Bind(&input)
+func (c *ReferenceModelController) Read(ctx *iris.Context) error {
+	input := &[]ReferenceModel{}
+	output := []ReferenceModel{}
+	var auxArray []ReferenceModel
+	if err := ctx.ReadJSON(input); err != nil {
+		response := []response{{Message: "Could not read input JSON"}}
+		ctx.JSON(iris.StatusBadRequest, response)
+		return
+	}
 
-	for i := range input.array {
-		auxArray = c.config.dao.Read(&input.array[i])
+	for _, item := range *input {
+		auxArray = c.config.dao.Read(&item)
 		for j := range auxArray {
-			if !output.contains(auxArray[j]) {
+			if contains(output, auxArray[j]) {
 				output = append(output, auxArray[j])
 			}
 		}
 	}
 
-	return e.JSON(http.StatusOK, &output)
+	ctx.JSON(iris.StatusOK, output)
+	return
 }
 
-func (c *ReferenceModelController) Update(e echo.Context) error {
-	input := ReferenceModelArray{}
+func (c *ReferenceModelController) Update(ctx *iris.Context) error {
+	input := &[]ReferenceModel{}
 	output := []ReferenceModel{}
 	var auxModel *ReferenceModel
-	e.Bind(&input)
+	if err := ctx.ReadJSON(input); err != nil {
+		response := []response{{Message: "Could not read input JSON"}}
+		ctx.JSON(iris.StatusBadRequest, response)
+		return
+	}
 
-	for i := range input.array {
-		auxModel = c.config.dao.Update(&input.array[i], input.array[i].ID)
+	for _, item := range *input {
+		auxModel = c.config.dao.Update(&item, item.ID)
 		output = append(output, *auxModel)
 	}
 
-	return e.JSON(http.StatusOK, &output)
+	ctx.JSON(iris.StatusOK, output)
+	return
 }
 
-func (c *ReferenceModelController) Delete(e echo.Context) error {
-	input := ReferenceModelArray{}
-	e.Bind(&input)
-
-	for i := range input.array {
-		c.config.dao.Delete(&input.array[i])
+func (c *ReferenceModelController) Delete(ctx *iris.Context) error {
+	input := &[]ReferenceModel{}
+	if err := ctx.ReadJSON(input); err != nil {
+		response := []response{{Message: "Could not read input JSON"}}
+		ctx.JSON(iris.StatusBadRequest, response)
+		return
 	}
 
-	return e.String(http.StatusOK, "ReferenceModels deleted")
+	for _, item := range *input {
+		c.config.dao.Delete(&item)
+	}
+
+	response := []response{{Message: "Items deleted"}}
+	ctx.JSON(iris.StatusOK, response)
+	return
 }
