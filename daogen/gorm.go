@@ -3,7 +3,6 @@ package daogen
 import (
   "os"
   "path/filepath"
-  "runtime"
   "strings"
   "github.com/azer/snakecase"
   "github.com/flowup/gogen"
@@ -41,13 +40,10 @@ func GenerateGorm(args []string) error {
     // parse import string using $GOPATH
     //importString := strings.TrimLeft(absolutePath, os.Getenv("GOPATH")+"src")
 		importString := absolutePath[len(os.Getenv("GOPATH") + "/src/"):]
-		if runtime.GOOS == "windows" {
-      importString = strings.Replace(importString, "\\", "/", -1)
-    }
     // retrieve the file from the build
 		file := build.File(filepath.Base(filePath))
 
-    var modelPackage string
+	    var modelPackage string
 		var pack string
     if absolutePath == pwdBase {
       pack = file.Package()
