@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"flowdock.eu/flowup/services/filecache"
+	"github.com/flowup/backend-services/filecache"
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
 )
