@@ -63,7 +63,9 @@ func Generate(args []string) error {
 					case "int64":
 						fallthrough
 					case "int":
-						fieldOps += fieldName + " : load" + fieldType +"QueryParam(ctx, \"" + fieldName + "\"),\n\t\t\t"
+						fallthrough
+					case "float64":
+						fieldOps += fieldName + " : load" + fieldType +"QueryParam(ctx, convertFieldName(\"" + fieldName + "\")),\n\t\t\t"
 					}
 				}
 

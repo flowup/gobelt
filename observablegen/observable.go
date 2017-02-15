@@ -6,7 +6,7 @@ import (
 
   "github.com/flowup/gogen"
   "github.com/flowup/gobelt"
-	"flowdock.eu/flowup/services/filecache"
+	"github.com/flowup/backend-services/filecache"
 )
 
 // TemplateData is a data structure for the observable template

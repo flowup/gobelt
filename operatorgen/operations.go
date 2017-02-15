@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"flowdock.eu/flowup/services/filecache"
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
+	"github.com/flowup/backend-services/filecache"
 )
 
 // TemplateData is a data structure for the operations template
