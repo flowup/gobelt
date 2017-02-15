@@ -11,6 +11,12 @@ func (dao *DAOName) ReadByFieldPrimitive(m PrimitiveType) ([]ReferenceModel, err
 	return retVal, nil
 }
 
+func (dao *DAOName) ReadByFieldPrimitiveT(m PrimitiveType) (*gorm.DB, error) {
+	retVal := dao.db.Where(&ReferenceModel{FieldPrimitive: m})
+
+	return retVal, retVal.Error
+}
+
 // DeleteByFieldPrimitive deletes all records in database with
 // FieldPrimitive the same as parameter given
 func (dao *DAOName) DeleteByFieldPrimitive(m PrimitiveType) error {

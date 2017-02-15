@@ -15,7 +15,7 @@ type DAOName struct {
 // ReferenceModel model.
 func NewDAOName(db *gorm.DB) *DAOName {
 	return &DAOName{
-		db:db,
+		db: db,
 	}
 }
 
@@ -37,6 +37,11 @@ func (dao *DAOName) Read(m *ReferenceModel) ([]ReferenceModel, error) {
 	return retVal, nil
 }
 
+func (dao *DAOName) ReadT(m *ReferenceModel) (*gorm.DB, error) {
+	retVal := dao.db.Where(m)
+	return retVal, retVal.Error
+}
+
 // ReadByID will find ReferenceModel by ID given by parameter
 func (dao *DAOName) ReadByID(id uint) (*ReferenceModel, error) {
 	m := &ReferenceModel{}
@@ -45,6 +50,13 @@ func (dao *DAOName) ReadByID(id uint) (*ReferenceModel, error) {
 	}
 
 	return m, nil
+}
+
+func (dao *DAOName) ReadByIDT(id uint) (*gorm.DB, error) {
+	m := &ReferenceModel{}
+	retVal := dao.db.First(&m, id)
+
+	return retVal, retVal.Error
 }
 
 // Update will update a record of ReferenceModel in DB
@@ -95,4 +107,10 @@ func (dao *DAOName) GetAll() ([]ReferenceModel, error) {
 	}
 
 	return m, nil
+}
+
+func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
+	retVal := dao.db.Where(query)
+
+	return retVal, retVal.Error
 }
