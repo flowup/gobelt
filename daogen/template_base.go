@@ -37,6 +37,8 @@ func (dao *DAOName) Read(m *ReferenceModel) ([]ReferenceModel, error) {
 	return retVal, nil
 }
 
+// ReadT will return a transaction that
+// can be used to find DB records matching with models
 func (dao *DAOName) ReadT(m *ReferenceModel) (*gorm.DB, error) {
 	retVal := dao.db.Where(m)
 	return retVal, retVal.Error
@@ -52,9 +54,11 @@ func (dao *DAOName) ReadByID(id uint) (*ReferenceModel, error) {
 	return m, nil
 }
 
+// ReadByIDT will return a transaction that
+// an be used to find DB record with ID given by parameter
 func (dao *DAOName) ReadByIDT(id uint) (*gorm.DB, error) {
-	m := &ReferenceModel{}
-	retVal := dao.db.First(&m, id)
+	//m := &ReferenceModel{}
+	retVal := dao.db.Where("ID = ?", id)
 
 	return retVal, retVal.Error
 }
@@ -109,6 +113,8 @@ func (dao *DAOName) GetAll() ([]ReferenceModel, error) {
 	return m, nil
 }
 
+// ExecuteCustomQueryT will execute a query string
+// given by parameter on DB and return the transaction
 func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 	retVal := dao.db.Where(query)
 

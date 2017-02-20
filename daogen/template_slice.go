@@ -1,5 +1,7 @@
 package daogen
 
+/* END OF HEADER */
+
 // AddFieldSliceAssociation will add
 // an association to model given by parameter
 func (dao *DAOName) AddFieldSliceAssociation(m *ReferenceModel, asocVal *AuxModel) (*ReferenceModel, error) {
