@@ -30,3 +30,7 @@ $ gobelt # for usage information
 - [ ] Data Access Objects (pure SQL)
 - [ ] Function RPC (for microservices)
 - [ ] More to come soon
+
+### DAO generator
+
+This part of gobelt generates data access objects based on models. Please note that generated methods ending with `T` (`ReadT` for example) are methods that return the db transaction instead of the models. These methods can be used to minimize number of redundant requests to DB.
