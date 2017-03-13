@@ -1,6 +1,12 @@
 package daogen
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+)
+
+// If your model does not use uint IDs rewrite this definition
+// ReferenceModelIDType is type of ID
+type ReferenceModelIDType uint
 
 // PrimitiveType is a placeholder for int type
 type PrimitiveType int
@@ -10,7 +16,10 @@ type SliceType []AuxModel
 
 // AuxModel is an auxiliary structure tha is embedded in ReferenceModel
 type AuxModel struct {
-	gorm.Model
+	ID ReferenceModelIDType `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
 
 	ReferenceModelID uint
 	AuxModelField    PrimitiveType
@@ -18,9 +27,23 @@ type AuxModel struct {
 
 // ReferenceModel is a model upon which is based template
 type ReferenceModel struct {
-	gorm.Model
+	ID ReferenceModelIDType `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
 
 	FieldStruct    AuxModel
 	FieldPrimitive PrimitiveType
 	FieldSlice     SliceType
+}
+
+type AuxModelEmbedded struct {
+	ID ReferenceModelIDType `gorm:"primary_key"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
+}
+
+type ReferenceModelEmbedded struct {
+	AuxModelEmbedded
 }

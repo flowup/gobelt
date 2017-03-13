@@ -10,6 +10,7 @@ import (
 	"github.com/flowup/backend-services/filecache"
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
+	"fmt"
 )
 
 // TemplateData is used to hold data about given models
@@ -84,6 +85,12 @@ func GenerateGorm(args []string) error {
 			baseString += lines[i]
 		}
 
+		readByID := filecache.Cache.LoadFile(templatePath + "/template_readByID.go")
+		readByIDString := strings.Split(string(readByID), HeaderSeparator)[1]
+
+		readByIDEmbedded := filecache.Cache.LoadFile(templatePath + "/template_readByIDEmbedded.go")
+		readByIDEmbeddedString := strings.Split(string(readByIDEmbedded), HeaderSeparator)[1]
+
 		primitiveRead := filecache.Cache.LoadFile(templatePath + "/template_primitive.go")
 		primitiveString := strings.Split(string(primitiveRead), HeaderSeparator)[1]
 		//strings.TrimLeft((string)(primitiveRead), "package daogen\n")
@@ -102,48 +109,78 @@ func GenerateGorm(args []string) error {
 		for stName, stVal := range file.Structs().Filter("@dao") {
 			// reset outputString to base template
 			outputString := baseString
+			idTypeString := "uint"
+			embStructWithIDName := ""
 
 			// update suite name
 			data.ModelName = stName
 			data.DAOName = data.ModelName + "DAO"
 			data.TableName = snakecase.SnakeCase(stName) + "s"
 
-			for _, fieldVal := range stVal.Fields() {
-
-				var typeType int
-				data.FieldName = fieldVal.Name()
-				data.FieldType, typeType = fieldVal.Type()
-				// if it is not a gorm ID or one of
-				// the time parameters execute field template
-				if data.FieldName != "ID" &&
-					data.FieldName != "CreatedAt" &&
-					data.FieldName != "UpdatedAt" &&
-					data.FieldName != "DeletedAt" {
-
-					var fieldOps string
-					switch typeType {
-					case gogen.SelectorType:
-						neededPackages = append(neededPackages, strings.Split(data.FieldType, ".")[0])
-						fallthrough
-					case gogen.StructType:
-						// compose functions for struct types
-						fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
-						fieldOps = strings.Replace(fieldOps, "AuxModel", data.FieldType, -1)
-					case gogen.PrimitiveType:
-						// compose functions for primitive types
-						fieldOps = strings.Replace(primitiveString, "PrimitiveType", data.FieldType, -1)
-						fieldOps = strings.Replace(fieldOps, "FieldPrimitive", data.FieldName, -1)
-					case gogen.SliceType:
-						// compose functions for array types
-						fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage+data.FieldType, -1)
-						fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
+			for fieldName, fieldVal := range stVal.Fields() {
+				if len(fieldName) != 0 && fieldName[0] == '_' {
+					embStr := file.Struct(fieldName[1:])
+					if embStr != nil {
+						for embFiName, embFi := range embStr.Fields() {
+							if embFiName == "ID" {
+								embStructWithIDName = embStr.Name()
+								idTypeString, _ = embFi.Type()
+								outputString += readByIDEmbeddedString
+								break
+							}
+						}
 					}
-					outputString += (fieldOps)
+				} else {
+					var typeType int
+					data.FieldName = fieldVal.Name()
+					data.FieldType, typeType = fieldVal.Type()
+					// if it is not a gorm ID or one of
+					// the time parameters execute field template
+					if data.FieldName != "ID" &&
+						data.FieldName != "CreatedAt" &&
+						data.FieldName != "UpdatedAt" &&
+						data.FieldName != "DeletedAt" {
+
+						var fieldOps string
+						switch typeType {
+						case gogen.SelectorType:
+							neededPackages = append(neededPackages, strings.Split(data.FieldType, ".")[0])
+							fallthrough
+						case gogen.StructType:
+							if data.FieldName != "" {
+								// compose functions for struct types
+								fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
+								fieldOps = strings.Replace(fieldOps, "AuxModel", data.FieldType, -1)
+							}
+						case gogen.PrimitiveType:
+							if data.FieldName != "" {
+								// compose functions for primitive types
+								fieldOps = strings.Replace(primitiveString, "PrimitiveType", data.FieldType, -1)
+								fieldOps = strings.Replace(fieldOps, "FieldPrimitive", data.FieldName, -1)
+							}
+						case gogen.SliceType:
+							if data.FieldName != "" {
+								// compose functions for array types
+								fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage+data.FieldType, -1)
+								fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
+							}
+						}
+						outputString += fieldOps
+					}
 				}
 			}
+			if embStructWithIDName == "" {
+				outputString += readByIDString
+			}
 			// replace template names with the names of current structure
+
+			fmt.Println(idTypeString, embStructWithIDName)
 			outputString = strings.Replace(outputString, "reference_models", data.TableName, -1)
+			outputString = strings.Replace(outputString, "ReferenceModelIDType", idTypeString, -1)
+			outputString = strings.Replace(outputString, "DAONameEmbedded", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
+			outputString = strings.Replace(outputString, "AuxModelEmbedded", embStructWithIDName, -1)
+			outputString = strings.Replace(outputString, "ReferenceModelEmbedded", data.ModelPackage+data.ModelName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModel", data.ModelPackage+data.ModelName, -1)
 
 			outputStrings = append(outputStrings, outputString)

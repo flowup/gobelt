@@ -44,19 +44,9 @@ func (dao *DAOName) ReadT(m *ReferenceModel) (*gorm.DB, error) {
 	return retVal, retVal.Error
 }
 
-// ReadByID will find ReferenceModel by ID given by parameter
-func (dao *DAOName) ReadByID(id uint) (*ReferenceModel, error) {
-	m := &ReferenceModel{}
-	if err := dao.db.First(&m, id).Error; err != nil {
-		return nil, err
-	}
-
-	return m, nil
-}
-
 // ReadByIDT will return a transaction that
 // an be used to find DB record with ID given by parameter
-func (dao *DAOName) ReadByIDT(id uint) (*gorm.DB, error) {
+func (dao *DAOName) ReadByIDT(id ReferenceModelIDType) (*gorm.DB, error) {
 	//m := &ReferenceModel{}
 	retVal := dao.db.Where("ID = ?", id)
 
@@ -64,7 +54,7 @@ func (dao *DAOName) ReadByIDT(id uint) (*gorm.DB, error) {
 }
 
 // Update will update a record of ReferenceModel in DB
-func (dao *DAOName) Update(m *ReferenceModel, id uint) (*ReferenceModel, error) {
+func (dao *DAOName) Update(m *ReferenceModel, id ReferenceModelIDType) (*ReferenceModel, error) {
 	oldVal, err := dao.ReadByID(id)
 	if err != nil {
 		return nil, err
