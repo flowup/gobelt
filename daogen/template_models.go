@@ -4,8 +4,7 @@ import (
 	"time"
 )
 
-// If your model does not use uint IDs rewrite this definition
-// ReferenceModelIDType is type of ID
+// ReferenceModelIDType is placeholder type of ID
 type ReferenceModelIDType uint
 
 // PrimitiveType is a placeholder for int type
@@ -37,6 +36,7 @@ type ReferenceModel struct {
 	FieldSlice     SliceType
 }
 
+// AuxModelEmbedded is an auxiliary structure tha is embedded in ReferenceModel
 type AuxModelEmbedded struct {
 	ID ReferenceModelIDType `gorm:"primary_key"`
 	CreatedAt time.Time
@@ -44,10 +44,17 @@ type AuxModelEmbedded struct {
 	DeletedAt *time.Time `sql:"index"`
 }
 
+// ReferenceModelEmbedded is a model upon which is based template
+// with embedded ID declaration
 type ReferenceModelEmbedded struct {
 	AuxModelEmbedded
 }
 
+// ReferenceModelStringID is a model upon which is based template
+// with string id
 type ReferenceModelStringID struct {
 	ID string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time `sql:"index"`
 }

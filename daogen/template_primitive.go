@@ -1,6 +1,9 @@
 package daogen
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+)
 
 /* END OF HEADER */
 
@@ -58,6 +61,7 @@ func (dao *DAOName) SetFieldPrimitive(m *ReferenceModel, newVal PrimitiveType) (
 	return record, nil
 }
 
+// ReadByFieldPrimitive is a mock implementation of ReadByFieldPrimitive method
 func (mock *DAONameMock) ReadByFieldPrimitive(m PrimitiveType) ([]ReferenceModel, error) {
 	ret := make([]ReferenceModel, 0, len(mock.db))
 	for _, val := range mock.db {
@@ -69,10 +73,12 @@ func (mock *DAONameMock) ReadByFieldPrimitive(m PrimitiveType) ([]ReferenceModel
 	return ret, nil
 }
 
+// ReadByFieldPrimitiveT is a mock implementation of ReadByFieldPrimitiveT method
 func (mock *DAONameMock) ReadByFieldPrimitiveT(m PrimitiveType) (*gorm.DB, error) {
 	return nil, nil
 }
 
+// DeleteByFieldPrimitive is a mock implementation of DeleteByFieldPrimitive method
 func (mock *DAONameMock) DeleteByFieldPrimitive(m PrimitiveType) (error) {
 	for _, val := range mock.db {
 		if val.FieldPrimitive == m {
@@ -83,21 +89,25 @@ func (mock *DAONameMock) DeleteByFieldPrimitive(m PrimitiveType) (error) {
 	return nil
 }
 
+// EditByFieldPrimitive is a mock implementation of EditByFieldPrimitive method
 func (mock *DAONameMock) EditByFieldPrimitive(m PrimitiveType, newVals *ReferenceModel) (error) {
 	for _, val := range mock.db {
 		if val.FieldPrimitive == m {
 			id := val.ID
 			val = *newVals
 			val.ID = id
+			val.UpdatedAt = time.Now()
 		}
 	}
 
 	return nil
 }
 
+// SetFieldPrimitive is a mock implementation of SetFieldPrimitive method
 func (mock *DAONameMock) SetFieldPrimitive(m *ReferenceModel, newVal PrimitiveType) (*ReferenceModel, error) {
 	edit := mock.db[m.ID]
 	edit.FieldPrimitive = newVal
+	edit.UpdatedAt = time.Now()
 
 	mock.db[m.ID] = edit
 	return &edit, nil

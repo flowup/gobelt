@@ -1,5 +1,7 @@
 package daogen
 
+import "time"
+
 /* END OF HEADER */
 
 // AddFieldSliceAssociation will add
@@ -33,16 +35,20 @@ func (dao *DAOName) GetAllAssociatedFieldSlice(m *ReferenceModel) ([]AuxModel, e
 	return retVal, nil
 }
 
+// AddFieldSliceAssociation is a mock implementation of AddFieldSliceAssociation method
 func (mock *DAONameMock) AddFieldSliceAssociation(m *ReferenceModel, asocVal *AuxModel) (*ReferenceModel, error) {
 	edit := mock.db[m.ID]
 	edit.FieldSlice = append(edit.FieldSlice, *asocVal)
+	edit.UpdatedAt = time.Now()
 	mock.db[m.ID] = edit
 
 	return &edit, nil
 }
 
+// RemoveFieldSliceAssociation is a mock implementation of RemoveFieldSliceAssociation method
 func (mock *DAONameMock) RemoveFieldSliceAssociation(m *ReferenceModel, asocVal *AuxModel) (*ReferenceModel, error) {
 	a := m.FieldSlice
+	m.UpdatedAt = time.Now()
 	deletedIndex := 0
 	for j, val := range a {
 		if val == *asocVal {
@@ -53,4 +59,9 @@ func (mock *DAONameMock) RemoveFieldSliceAssociation(m *ReferenceModel, asocVal 
 	a = a[:len(a)-1]
 
 	return m, nil
+}
+
+// GetAllAssociatedFieldSlice is a mock implementation of GetAllAssociatedFieldSlice method
+func (mock *DAONameMock) GetAllAssociatedFieldSlice(m *ReferenceModel) ([]AuxModel, error) {
+	return m.FieldSlice, nil
 }

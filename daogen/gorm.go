@@ -10,7 +10,6 @@ import (
 	"github.com/flowup/backend-services/filecache"
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
-	"fmt"
 	"regexp"
 )
 
@@ -207,13 +206,11 @@ func GenerateGorm(args []string) error {
 			outputString = strings.Replace(outputString, "ReferenceModel", data.ModelPackage+data.ModelName, -1)
 
 			decls := matcher.FindAllString(outputString, -1)
-			fmt.Println(decls)
 			if decls != nil {
 				outputString += "\ntype " + data.DAOName + "Interface interface {\n"
 				cut := len("(dao *" + data.DAOName + ")")
 				for _, dec := range decls {
-					fmt.Println(dec[cut:])
-					outputString += "\t" + dec[len(ImplementationPrefix) + 2:] + "\n"
+					outputString += "\t" + dec[cut:] + "\n"
 				}
 				outputString += "}"
 			}

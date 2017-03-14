@@ -2,7 +2,7 @@ package daogen
 
 import "github.com/jinzhu/gorm"
 
-
+// DAONameEmbedded is a DAO for model with embedded ID declaration
 type DAONameEmbedded struct {
 	db *gorm.DB
 }

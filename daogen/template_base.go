@@ -111,22 +111,55 @@ func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 	return retVal, retVal.Error
 }
 
+// ReadByID is a mock implementation of ReadByID method
+func (mock *DAONameMock) ReadByID(id ReferenceModelIDType) (*ReferenceModel, error) {
+	ret := mock.db[id]
+	return &ret, nil
+}
 
+// ReadByIDT is a mock implementation of ReadByIDT method
+func (mock *DAONameMock) ReadByIDT(id ReferenceModelIDType) (*gorm.DB, error) {
+	return nil, nil
+}
+
+// ReadT is a mock implementation of ReadT method
+func (mock *DAONameMock) ReadT(m *ReferenceModel) (*gorm.DB, error) {
+	return nil, nil
+}
+
+// Update is a mock implementation of Update method
 func (mock *DAONameMock) Update(m *ReferenceModel, id ReferenceModelIDType) (*ReferenceModel, error) {
+	m.UpdatedAt = time.Now()
 	mock.db[id] = *m
 	return m, nil
 }
 
+// UpdateAllFields is a mock implementation of UpdateAllFields method
 func (mock *DAONameMock) UpdateAllFields(m *ReferenceModel) (*ReferenceModel, error) {
+	m.UpdatedAt = time.Now()
 	mock.db[m.ID] = *m
 	return m, nil
 }
 
+// Delete is a mock implementation of Delete method
 func (mock *DAONameMock) Delete(m *ReferenceModel) (error) {
 	delete(mock.db, m.ID)
 	return nil
 }
 
+// GetUpdatedAfter is a mock implementation of GetUpdatedAfter method
+func (mock *DAONameMock) GetUpdatedAfter(timestamp time.Time) ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for _, val :=  range mock.db {
+		if val.UpdatedAt.After(timestamp) {
+			ret = append(ret, val)
+		}
+	}
+
+	return ret, nil
+}
+
+// GetAll is a mock implementation of GetAll method
 func (mock *DAONameMock) GetAll() ([]ReferenceModel, error) {
 	ret := make([]ReferenceModel, 0, len(mock.db))
 	for _, val := range mock.db {
@@ -136,6 +169,7 @@ func (mock *DAONameMock) GetAll() ([]ReferenceModel, error) {
 	return ret, nil
 }
 
+// ExecuteCustomQueryT is a mock implementation of ExecuteCustomQueryT method
 func (mock *DAONameMock) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 	return nil, nil
 }
