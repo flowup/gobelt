@@ -111,6 +111,12 @@ func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 	return retVal, retVal.Error
 }
 
+// Read is a mock implementation of Read method
+func (mock *DAONameMock) Read(m *ReferenceModel) ([]ReferenceModel, error) {
+	return []ReferenceModel{}, nil
+}
+
+
 // ReadByID is a mock implementation of ReadByID method
 func (mock *DAONameMock) ReadByID(id ReferenceModelIDType) (*ReferenceModel, error) {
 	ret := mock.db[id]
