@@ -32,3 +32,25 @@ func (dao *DAOName) GetAllAssociatedFieldSlice(m *ReferenceModel) ([]AuxModel, e
 	}
 	return retVal, nil
 }
+
+func (mock *DAONameMock) AddFieldSliceAssociation(m *ReferenceModel, asocVal *AuxModel) (*ReferenceModel, error) {
+	edit := mock.db[m.ID]
+	edit.FieldSlice = append(edit.FieldSlice, *asocVal)
+	mock.db[m.ID] = edit
+
+	return &edit, nil
+}
+
+func (mock *DAONameMock) RemoveFieldSliceAssociation(m *ReferenceModel, asocVal *AuxModel) (*ReferenceModel, error) {
+	a := m.FieldSlice
+	deletedIndex := 0
+	for j, val := range a {
+		if val == *asocVal {
+			deletedIndex = j
+		}
+	}
+	a[deletedIndex] = a[len(a)-1]
+	a = a[:len(a)-1]
+
+	return m, nil
+}

@@ -11,6 +11,7 @@ import (
 	"github.com/flowup/gobelt"
 	"github.com/flowup/gogen"
 	"fmt"
+	"regexp"
 )
 
 // TemplateData is used to hold data about given models
@@ -26,7 +27,11 @@ type TemplateData struct {
 }
 
 // HeaderSeparator separates headers from methods in templates
-const HeaderSeparator = "/* END OF HEADER */"
+const(
+	HeaderSeparator = "/* END OF HEADER */"
+	ImplementationPrefix = `\(dao [^\)]*\) `
+)
+
 
 // GenerateGorm will return a callback function that will generate a gorm based
 // data access object for given models
@@ -74,6 +79,8 @@ func GenerateGorm(args []string) error {
 
 		// compose template files path and open them
 
+
+		matcher := regexp.MustCompile(ImplementationPrefix + `[A-Z]\w*\([^\)]*\) \([^\)]*\)`)
 		var baseString string
 
 		templatePath := gobelt.GetTemplatePath("daogen")
@@ -95,9 +102,15 @@ func GenerateGorm(args []string) error {
 		primitiveString := strings.Split(string(primitiveRead), HeaderSeparator)[1]
 		//strings.TrimLeft((string)(primitiveRead), "package daogen\n")
 
+		uintIDMockRead := filecache.Cache.LoadFile(templatePath + "/template_uintIDMock.go")
+		uintIDMockString := strings.Split(string(uintIDMockRead), HeaderSeparator)[1]
+
 		sliceRead := filecache.Cache.LoadFile(templatePath + "/template_slice.go")
 		sliceString := strings.Split(string(sliceRead), HeaderSeparator)[1]
 		//strings.TrimLeft((string)(sliceRead), "package daogen\n")
+
+		stringIDMockRead := filecache.Cache.LoadFile(templatePath + "/template_stringIDMock.go")
+		stringIDMockString := strings.Split(string(stringIDMockRead), HeaderSeparator)[1]
 
 		structRead := filecache.Cache.LoadFile(templatePath + "/template_struct.go")
 		structString := strings.Split(string(structRead), HeaderSeparator)[1]
@@ -125,6 +138,9 @@ func GenerateGorm(args []string) error {
 							if embFiName == "ID" {
 								embStructWithIDName = embStr.Name()
 								idTypeString, _ = embFi.Type()
+								if idTypeString == "string" {
+									neededPackages = append(neededPackages, `"strconv"`)
+								}
 								outputString += readByIDEmbeddedString
 								break
 							}
@@ -172,16 +188,35 @@ func GenerateGorm(args []string) error {
 			if embStructWithIDName == "" {
 				outputString += readByIDString
 			}
+
+			if idTypeString == "uint" {
+				outputString += uintIDMockString
+			} else if idTypeString == "string" {
+				outputString += stringIDMockString
+			}
 			// replace template names with the names of current structure
 
-			fmt.Println(idTypeString, embStructWithIDName)
 			outputString = strings.Replace(outputString, "reference_models", data.TableName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModelIDType", idTypeString, -1)
+			outputString = strings.Replace(outputString, "DAONameString", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "DAONameEmbedded", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "AuxModelEmbedded", embStructWithIDName, -1)
+			outputString = strings.Replace(outputString, "ReferenceModelStringID", data.ModelPackage+data.ModelName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModelEmbedded", data.ModelPackage+data.ModelName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModel", data.ModelPackage+data.ModelName, -1)
+
+			decls := matcher.FindAllString(outputString, -1)
+			fmt.Println(decls)
+			if decls != nil {
+				outputString += "\ntype " + data.DAOName + "Interface interface {\n"
+				cut := len("(dao *" + data.DAOName + ")")
+				for _, dec := range decls {
+					fmt.Println(dec[cut:])
+					outputString += "\t" + dec[len(ImplementationPrefix) + 2:] + "\n"
+				}
+				outputString += "}"
+			}
 
 			outputStrings = append(outputStrings, outputString)
 		}
@@ -189,6 +224,9 @@ func GenerateGorm(args []string) error {
 		for _, pack := range neededPackages {
 			if i := file.Import(pack); i != nil && pack != "time" {
 				generatedStr += "  " + i.String() + "\n"
+			}
+			if pack == `"strconv"` {
+				generatedStr += "  " + pack + "\n"
 			}
 		}
 		generatedStr += ")\n"

@@ -20,7 +20,7 @@ func NewDAOName(db *gorm.DB) *DAOName {
 }
 
 // Create will create single ReferenceModel in database.
-func (dao *DAOName) Create(m *ReferenceModel) error {
+func (dao *DAOName) Create(m *ReferenceModel) (error) {
 	if err := dao.db.Create(m).Error; err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (dao *DAOName) UpdateAllFields(m *ReferenceModel) (*ReferenceModel, error) 
 }
 
 // Delete will soft-delete a single ReferenceModel
-func (dao *DAOName) Delete(m *ReferenceModel) error {
+func (dao *DAOName) Delete(m *ReferenceModel) (error) {
 	if err := dao.db.Delete(m).Error; err != nil {
 		return err
 	}
@@ -109,4 +109,33 @@ func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 	retVal := dao.db.Where(query)
 
 	return retVal, retVal.Error
+}
+
+
+func (mock *DAONameMock) Update(m *ReferenceModel, id ReferenceModelIDType) (*ReferenceModel, error) {
+	mock.db[id] = *m
+	return m, nil
+}
+
+func (mock *DAONameMock) UpdateAllFields(m *ReferenceModel) (*ReferenceModel, error) {
+	mock.db[m.ID] = *m
+	return m, nil
+}
+
+func (mock *DAONameMock) Delete(m *ReferenceModel) (error) {
+	delete(mock.db, m.ID)
+	return nil
+}
+
+func (mock *DAONameMock) GetAll() ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for _, val := range mock.db {
+		ret = append(ret, val)
+	}
+
+	return ret, nil
+}
+
+func (mock *DAONameMock) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
+	return nil, nil
 }

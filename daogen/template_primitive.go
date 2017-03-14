@@ -25,7 +25,7 @@ func (dao *DAOName) ReadByFieldPrimitiveT(m PrimitiveType) (*gorm.DB, error) {
 
 // DeleteByFieldPrimitive deletes all records in database with
 // FieldPrimitive the same as parameter given
-func (dao *DAOName) DeleteByFieldPrimitive(m PrimitiveType) error {
+func (dao *DAOName) DeleteByFieldPrimitive(m PrimitiveType) (error) {
 	if err := dao.db.Where(&ReferenceModel{FieldPrimitive: m}).Delete(&ReferenceModel{}).Error; err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (dao *DAOName) DeleteByFieldPrimitive(m PrimitiveType) error {
 // EditByFieldPrimitive will edit all records in database
 // with the same FieldPrimitive as parameter given
 // using model given by parameter
-func (dao *DAOName) EditByFieldPrimitive(m PrimitiveType, newVals *ReferenceModel) error {
+func (dao *DAOName) EditByFieldPrimitive(m PrimitiveType, newVals *ReferenceModel) (error) {
 	if err := dao.db.Table("reference_models").Where(&ReferenceModel{FieldPrimitive: m}).Updates(newVals).Error; err != nil {
 		return err
 	}
@@ -56,4 +56,49 @@ func (dao *DAOName) SetFieldPrimitive(m *ReferenceModel, newVal PrimitiveType) (
 	}
 
 	return record, nil
+}
+
+func (mock *DAONameMock) ReadByFieldPrimitive(m PrimitiveType) ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for _, val := range mock.db {
+		if val.FieldPrimitive == m {
+			ret = append(ret, val)
+		}
+	}
+
+	return ret, nil
+}
+
+func (mock *DAONameMock) ReadByFieldPrimitiveT(m PrimitiveType) (*gorm.DB, error) {
+	return nil, nil
+}
+
+func (mock *DAONameMock) DeleteByFieldPrimitive(m PrimitiveType) (error) {
+	for _, val := range mock.db {
+		if val.FieldPrimitive == m {
+			delete(mock.db, val.ID)
+		}
+	}
+
+	return nil
+}
+
+func (mock *DAONameMock) EditByFieldPrimitive(m PrimitiveType, newVals *ReferenceModel) (error) {
+	for _, val := range mock.db {
+		if val.FieldPrimitive == m {
+			id := val.ID
+			val = *newVals
+			val.ID = id
+		}
+	}
+
+	return nil
+}
+
+func (mock *DAONameMock) SetFieldPrimitive(m *ReferenceModel, newVal PrimitiveType) (*ReferenceModel, error) {
+	edit := mock.db[m.ID]
+	edit.FieldPrimitive = newVal
+
+	mock.db[m.ID] = edit
+	return &edit, nil
 }

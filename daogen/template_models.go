@@ -47,3 +47,7 @@ type AuxModelEmbedded struct {
 type ReferenceModelEmbedded struct {
 	AuxModelEmbedded
 }
+
+type ReferenceModelStringID struct {
+	ID string
+}
