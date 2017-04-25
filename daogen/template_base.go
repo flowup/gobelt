@@ -15,12 +15,12 @@ type DAOName struct {
 // ReferenceModel model.
 func NewDAOName(db *gorm.DB) *DAOName {
 	return &DAOName{
-		db:db,
+		db: db,
 	}
 }
 
 // Create will create single ReferenceModel in database.
-func (dao *DAOName) Create(m *ReferenceModel) error {
+func (dao *DAOName) Create(m *ReferenceModel) (error) {
 	if err := dao.db.Create(m).Error; err != nil {
 		return err
 	}
@@ -37,18 +37,24 @@ func (dao *DAOName) Read(m *ReferenceModel) ([]ReferenceModel, error) {
 	return retVal, nil
 }
 
-// ReadByID will find ReferenceModel by ID given by parameter
-func (dao *DAOName) ReadByID(id uint) (*ReferenceModel, error) {
-	m := &ReferenceModel{}
-	if err := dao.db.First(&m, id).Error; err != nil {
-		return nil, err
-	}
+// ReadT will return a transaction that
+// can be used to find DB records matching with models
+func (dao *DAOName) ReadT(m *ReferenceModel) (*gorm.DB, error) {
+	retVal := dao.db.Where(m)
+	return retVal, retVal.Error
+}
 
-	return m, nil
+// ReadByIDT will return a transaction that
+// an be used to find DB record with ID given by parameter
+func (dao *DAOName) ReadByIDT(id ReferenceModelIDType) (*gorm.DB, error) {
+	//m := &ReferenceModel{}
+	retVal := dao.db.Where("ID = ?", id)
+
+	return retVal, retVal.Error
 }
 
 // Update will update a record of ReferenceModel in DB
-func (dao *DAOName) Update(m *ReferenceModel, id uint) (*ReferenceModel, error) {
+func (dao *DAOName) Update(m *ReferenceModel, id ReferenceModelIDType) (*ReferenceModel, error) {
 	oldVal, err := dao.ReadByID(id)
 	if err != nil {
 		return nil, err
@@ -70,7 +76,7 @@ func (dao *DAOName) UpdateAllFields(m *ReferenceModel) (*ReferenceModel, error) 
 }
 
 // Delete will soft-delete a single ReferenceModel
-func (dao *DAOName) Delete(m *ReferenceModel) error {
+func (dao *DAOName) Delete(m *ReferenceModel) (error) {
 	if err := dao.db.Delete(m).Error; err != nil {
 		return err
 	}
@@ -95,4 +101,88 @@ func (dao *DAOName) GetAll() ([]ReferenceModel, error) {
 	}
 
 	return m, nil
+}
+
+// ExecuteCustomQueryT will execute a query string
+// given by parameter on DB and return the transaction
+func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
+	retVal := dao.db.Where(query)
+
+	return retVal, retVal.Error
+}
+
+// Read is a mock implementation of Read method
+func (mock *DAONameMock) Read(m *ReferenceModel) ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for range mock.db {
+		/*if val == *m {
+			ret = append(ret, val)
+		}*/
+	}
+
+	return ret, nil
+}
+
+
+// ReadByID is a mock implementation of ReadByID method
+func (mock *DAONameMock) ReadByID(id ReferenceModelIDType) (*ReferenceModel, error) {
+	ret := mock.db[id]
+	return &ret, nil
+}
+
+// ReadByIDT is a mock implementation of ReadByIDT method
+func (mock *DAONameMock) ReadByIDT(id ReferenceModelIDType) (*gorm.DB, error) {
+	return nil, nil
+}
+
+// ReadT is a mock implementation of ReadT method
+func (mock *DAONameMock) ReadT(m *ReferenceModel) (*gorm.DB, error) {
+	return nil, nil
+}
+
+// Update is a mock implementation of Update method
+func (mock *DAONameMock) Update(m *ReferenceModel, id ReferenceModelIDType) (*ReferenceModel, error) {
+	m.UpdatedAt = time.Now()
+	mock.db[id] = *m
+	return m, nil
+}
+
+// UpdateAllFields is a mock implementation of UpdateAllFields method
+func (mock *DAONameMock) UpdateAllFields(m *ReferenceModel) (*ReferenceModel, error) {
+	m.UpdatedAt = time.Now()
+	mock.db[m.ID] = *m
+	return m, nil
+}
+
+// Delete is a mock implementation of Delete method
+func (mock *DAONameMock) Delete(m *ReferenceModel) (error) {
+	delete(mock.db, m.ID)
+	return nil
+}
+
+// GetUpdatedAfter is a mock implementation of GetUpdatedAfter method
+func (mock *DAONameMock) GetUpdatedAfter(timestamp time.Time) ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for _, val :=  range mock.db {
+		if val.UpdatedAt.After(timestamp) {
+			ret = append(ret, val)
+		}
+	}
+
+	return ret, nil
+}
+
+// GetAll is a mock implementation of GetAll method
+func (mock *DAONameMock) GetAll() ([]ReferenceModel, error) {
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for _, val := range mock.db {
+		ret = append(ret, val)
+	}
+
+	return ret, nil
+}
+
+// ExecuteCustomQueryT is a mock implementation of ExecuteCustomQueryT method
+func (mock *DAONameMock) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
+	return nil, nil
 }
