@@ -51,7 +51,7 @@ func (mock *DAONameMock) RemoveFieldSliceAssociation(m *ReferenceModel, asocVal 
 	m.UpdatedAt = time.Now()
 	deletedIndex := 0
 	for j, val := range a {
-		if val == *asocVal {
+		if val.ID == asocVal.ID {
 			deletedIndex = j
 		}
 	}

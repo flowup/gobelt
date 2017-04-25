@@ -14,3 +14,11 @@ func (dao *DAOName) SetFieldStruct(m *ReferenceModel, str AuxModel) (*ReferenceM
 
 	return m, nil
 }
+
+func (mock *DAONameMock) SetFieldStruct(m *ReferenceModel, str AuxModel) (*ReferenceModel, error) {
+	edit := mock.db[m.ID]
+	edit.FieldStruct = str
+
+	mock.db[m.ID] = edit
+	return &edit, nil
+}

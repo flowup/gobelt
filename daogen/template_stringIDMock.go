@@ -30,6 +30,7 @@ func (mock *DAONameStringMock) Create(m *ReferenceModelStringID) (error) {
 		if _, exists := mock.db[id]; !exists {
 			m.ID = id
 			mock.db[id] = *m
+			created = true
 		}
 	}
 	return nil

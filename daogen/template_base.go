@@ -113,7 +113,14 @@ func (dao *DAOName) ExecuteCustomQueryT(query string) (*gorm.DB, error) {
 
 // Read is a mock implementation of Read method
 func (mock *DAONameMock) Read(m *ReferenceModel) ([]ReferenceModel, error) {
-	return []ReferenceModel{}, nil
+	ret := make([]ReferenceModel, 0, len(mock.db))
+	for range mock.db {
+		/*if val == *m {
+			ret = append(ret, val)
+		}*/
+	}
+
+	return ret, nil
 }
 
 

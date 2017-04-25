@@ -26,6 +26,7 @@ func (mock *DAONameMock) Create(m *ReferenceModel) (error) {
 		if _, exists := mock.db[mock.lastID]; !exists {
 			m.ID = mock.lastID
 			mock.db[mock.lastID] = *m
+			created = true
 		}
 	}
 	return nil

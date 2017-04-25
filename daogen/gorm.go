@@ -147,7 +147,7 @@ func GenerateGorm(args []string) error {
 					}
 				} else {
 					var typeType int
-					data.FieldName = fieldVal.Name()
+					data.FieldName = fieldName
 					data.FieldType, typeType = fieldVal.Type()
 					// if it is not a gorm ID or one of
 					// the time parameters execute field template
@@ -157,6 +157,13 @@ func GenerateGorm(args []string) error {
 						data.FieldName != "DeletedAt" {
 
 						var fieldOps string
+
+
+						replace := data.FieldType // replacement for type of structure/slice of structures
+						if !strings.Contains(data.FieldType, ".") {
+							replace = data.ModelPackage + replace
+						}
+
 						switch typeType {
 						case gogen.SelectorType:
 							neededPackages = append(neededPackages, strings.Split(data.FieldType, ".")[0])
@@ -165,7 +172,7 @@ func GenerateGorm(args []string) error {
 							if data.FieldName != "" {
 								// compose functions for struct types
 								fieldOps = strings.Replace(structString, "FieldStruct", data.FieldName, -1)
-								fieldOps = strings.Replace(fieldOps, "AuxModel", data.FieldType, -1)
+								fieldOps = strings.Replace(fieldOps, "AuxModel", replace, -1)
 							}
 						case gogen.PrimitiveType:
 							if data.FieldName != "" {
@@ -176,7 +183,7 @@ func GenerateGorm(args []string) error {
 						case gogen.SliceType:
 							if data.FieldName != "" {
 								// compose functions for array types
-								fieldOps = strings.Replace(sliceString, "AuxModel", data.ModelPackage+data.FieldType, -1)
+								fieldOps = strings.Replace(sliceString, "AuxModel", replace, -1)
 								fieldOps = strings.Replace(fieldOps, "FieldSlice", data.FieldName, -1)
 							}
 						}
@@ -200,7 +207,8 @@ func GenerateGorm(args []string) error {
 			outputString = strings.Replace(outputString, "DAONameString", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "DAONameEmbedded", data.DAOName, -1)
 			outputString = strings.Replace(outputString, "DAOName", data.DAOName, -1)
-			outputString = strings.Replace(outputString, "AuxModelEmbedded", embStructWithIDName, -1)
+			outputString = strings.Replace(outputString, "/*first*/AuxModelEmbedded", embStructWithIDName, -1)
+			outputString = strings.Replace(outputString, "AuxModelEmbedded", data.ModelPackage + embStructWithIDName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModelStringID", data.ModelPackage+data.ModelName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModelEmbedded", data.ModelPackage+data.ModelName, -1)
 			outputString = strings.Replace(outputString, "ReferenceModel", data.ModelPackage+data.ModelName, -1)
